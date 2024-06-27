@@ -1,0 +1,5 @@
+Flask
+langchain
+langchain_community
+flask-swagger-ui
+flask-cors
