@@ -5,7 +5,9 @@ module.exports = {
   entry: './src/scripts/main.ts',  // Entry point of your TypeScript application
   output: {
     filename: 'bundle.js',  // Output bundle file name
-    path: path.resolve(__dirname, 'dist'),  // Output directory
+    path: path.resolve(__dirname, 'src/dist'),  // Output directory
+    library: 'App',
+    libraryTarget: 'var'
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.js'],  // Resolve TypeScript and JavaScript files
