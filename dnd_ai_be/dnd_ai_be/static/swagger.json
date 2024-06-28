@@ -17,7 +17,7 @@
           "parameters": [
             {
               "in": "body",
-              "name": "body",
+              "name": "query",
               "description": "User input",
               "required": true,
               "schema": {
