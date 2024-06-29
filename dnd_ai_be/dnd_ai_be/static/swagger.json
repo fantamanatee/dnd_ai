@@ -25,6 +25,12 @@
                 "properties": {
                   "userInput": {
                     "type": "string"
+                  },
+                  "FROM_ID": {
+                    "type": "string"
+                  },
+                  "TO_ID": {
+                    "type": "string"
                   }
                 }
               }

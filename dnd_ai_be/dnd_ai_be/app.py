@@ -9,16 +9,16 @@ CORS(app, resources={r"/query": {"origins": [
     "http://localhost:8080",
     "http://127.0.0.1:5000",
     "http://localhost:5000",
-    ]}})  # Adjust to your frontend URL
+    ]}})  # whitelisted origins
 
 @app.route('/query', methods=['POST'])
 def handle_query():
     data = request.json
     user_input = data.get('userInput', '')
-    response_message = f"Hello World, {user_input}!"
-
-    print('Response message:', response_message)  # Print the response message
-
+    from_id = data.get('FROM_ID', '')
+    to_id = data.get('TO_ID', '')
+    # response_message = f"Hello World! userInput: {user_input}"
+    response_message = f"Hello World! userInput: {user_input}, FROM_ID: {from_id}, TO_ID: {to_id}"
     return jsonify({'message': response_message})
 
 
