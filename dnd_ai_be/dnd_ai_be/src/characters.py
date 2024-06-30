@@ -11,6 +11,11 @@ class Entity:
         """Returns a string representation of the entity."""
         return f"Race: {self.race}, Tags: {self.tags}, Description: {self.description[:50]}"
 
+    def to_dict(self):
+        ''' Convert the entity to a dictionary.
+        '''
+        return vars(self)
+
 class Character(Entity):
     '''
     A DnD Character. Parent class of NPCs and Players. Inherits from Entity.
@@ -78,19 +83,3 @@ class Player(Character):
         return f"Player {super().__str__()}, Class: {self.player_class}, Level: {self.level}"
 
 
-if __name__ == '__main__':
-    # Example NPCs
-    npc1 = NPC(role="Merchant", name="Gimble", race="Halfling", tags=["Trader"], description="A jovial halfling merchant.")
-    npc2 = NPC(role="Guard", name="Thorn", race="Human", tags=["Guard", "City Watch"], description="A vigilant human guard.")
-
-    # Example Players
-    player1 = Player(player_class="Wizard", level=5, name="Elowen", race="Elf", tags=["Adventurer"], description="A wise elven wizard.")
-    player2 = Player(player_class="Fighter", level=3, name="Garrick", race="Human", tags=["Mercenary"], description="A skilled human fighter.")
-
-    # Example Entities
-    entity1 = Entity(race="Dragonborn", tags=["Mythical", "Dragon"], description="A majestic dragonborn warrior.")
-    entity2 = Entity(race="Human", tags=["Commoner"], description="A humble human villager.")
-
-    for entity in [npc1, npc2, player1, player2, entity1, entity2]:
-        print(entity)
-        print()
