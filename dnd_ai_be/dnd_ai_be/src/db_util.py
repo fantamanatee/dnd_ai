@@ -1,45 +1,33 @@
-import psycopg2
+from pymongo import MongoClient
+from dnd_ai_be.src.characters import Entity, NPC, Player
 
-if __name__ == '__main__':
+# from langchain_core.load.serializable import Serializable
+# from langchain_core.documents import Document
+
+from typing import Union
+import os
+
+URI = f"mongodb+srv://{os.getenv('DND_AI_DB_USER')}:{os.getenv('DND_AI_DB_PWD')}@cluster91339.czkmuen.mongodb.net/?appName=Cluster91339"
+CLIENT = MongoClient(URI)
+DB_NAME = 'test_db'
+DB = CLIENT[DB_NAME]
+
+# TODO close client during long periods of inactivity.
+
+
+def db_insert_one(object: Union[Player, NPC, Entity]) -> None:
     '''
-    Main function to test database connection.
+    Insert an instance of Entity, NPC, or Player into the database.
     '''
-    # Define your connection parameters
-    dbname = 'dnd_ai'
-    user = 'dnd_ai'  # Replace with your PostgreSQL username
-    password = 'drowssap1'   # Replace with your PostgreSQL password if any
-    host = 'localhost'           # Replace with your PostgreSQL server hostname or IP
-    port = '5432'                # Replace with your PostgreSQL port
 
-    # Establish a connection to the database
-    try:
-        conn = psycopg2.connect(dbname=dbname, user=user, password=password, host=host, port=port)
-        print('Connected to the database!')
-        
-        # Create a cursor object using the connection
-        cursor = conn.cursor()
-        # Define the SQL statement for insertion
-        sql = """
-            INSERT INTO dummy_table (name, age, created_at)
-            VALUES (%s, %s, %s);
-        """
-        # Example data for insertion
-        data = ('value1', '123', '2024-06-28 23:50:53.467172')
-        # Execute the SQL statement
-        cursor.execute(sql, data)
-        
-        # Example query
-        cursor.execute('SELECT * FROM dummy_table;')
-
-        
-        # Fetch and print results
-        rows = cursor.fetchall()
-        for row in rows:
-            print(row)
-        
-        # Close cursor and connection
-        cursor.close()
-        conn.close()
-
-    except psycopg2.Error as e:
-        print('Error connecting to PostgreSQL:', e)
+    # check in order of children to parent
+    if isinstance(object, Player):
+        result = DB.Players.insert_one(object.to_dict())
+    elif isinstance(object, NPC):
+        result = DB.NPCs.insert_one(object.to_dict())
+    elif isinstance(object, Entity):
+        result = DB.Entities.insert_one(object.to_dict())
+    else:
+        raise ValueError("Object must be an instance of Entity, NPC, or Player.")
+    
+    print(f"Inserted {type(object)} with ID: {result.inserted_id}")
