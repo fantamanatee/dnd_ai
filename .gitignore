@@ -1,3 +1,22 @@
+# USER DEFINED -- BACKEND
+dnd_ai_be/dnd_ai_be/data
+
+# USER DEFINED -- FRONTEND
+dnd_ai_fe/package-lock.json
+dnd_ai_fe/node_modules
+dnd_ai_fe/dist
+
+dnd_ai_fe/src/sum.test.ts
+dnd_ai_fe/src/sum.ts
+dnd_ai_fe/src/scripts/main.ts
+dnd_ai_be/dnd_ai_be/experiments
+
+# USER DEFINED -- OTHER
+.vscode
+.DS_Store
+
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -158,3 +177,4 @@ cython_debug/
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
+

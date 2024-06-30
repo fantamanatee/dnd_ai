@@ -1,0 +1,9 @@
+Flask
+langchain
+langchain_community
+langchain_chroma
+langchain_openai
+langchain_text_splitters
+flask-swagger-ui
+flask-cors
+psycopg2-binary
