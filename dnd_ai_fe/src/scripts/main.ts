@@ -1,5 +1,3 @@
-require('dotenv').config();
-// const backend_url = 
 
 export async function sendQuery() {
   /**
@@ -16,7 +14,8 @@ export async function sendQuery() {
     const userInput = (<HTMLInputElement>document.getElementById('userInput')).value;
     const FROM_ID = (<HTMLInputElement>document.getElementById('FROM_ID')).value;
     const TO_ID = (<HTMLInputElement>document.getElementById('TO_ID')).value;
-    const url = process.env.BACKEND_URL!;  // Replace with your Flask backend URL
+    const url = 'http://localhost:5000/query';  // WTF???
+    // const url = 'http://127.0.0.1:5000';
     const response = await fetch(url, {
       method: 'POST',
       headers: {
@@ -35,7 +34,7 @@ export async function sendQuery() {
     }
   }
 
-// Add event listener for DOMContentLoaded // FIXME this doesnt work rn. Still using onclick
+// Add event listener for DOMContentLoaded 
 document.addEventListener('DOMContentLoaded', () => {
   const sendQueryButton = document.getElementById('sendQueryButton');
   if (sendQueryButton) {

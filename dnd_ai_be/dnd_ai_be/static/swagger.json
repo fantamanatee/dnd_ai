@@ -1,0 +1,74 @@
+{
+    "swagger": "2.0",
+    "info": {
+      "description": "API documentation for the /query endpoint",
+      "version": "1.0.0",
+      "title": "Query API"
+    },
+    "host": "localhost:5000",
+    "basePath": "/",
+    "schemes": [
+      "http"
+    ],
+    "paths": {
+      "/query": {
+        "post": {
+          "summary": "Send a query",
+          "description": "Send a query to the backend and get a response",
+          "consumes": [
+            "application/json"
+          ],
+          "produces": [
+            "application/json"
+          ],
+          "parameters": [
+            {
+              "in": "body",
+              "name": "body",
+              "description": "User input",
+              "required": true,
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userInput": {
+                    "type": "string",
+                    "description": "The input from the user",
+                    "example": "Hello"
+                  },
+                  "FROM_ID": {
+                    "type": "string",
+                    "description": "The ID of the sender",
+                    "example": "123"
+                  },
+                  "TO_ID": {
+                    "type": "string",
+                    "description": "The ID of the recipient",
+                    "example": "456"
+                  }
+                },
+                "required": ["userInput", "FROM_ID", "TO_ID"]
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "A JSON response containing the processed input",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "description": "The response message"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Invalid input"
+            }
+          }
+        }
+      }
+    }
+  }
+  
