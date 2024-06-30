@@ -10,10 +10,10 @@ setup(
         'langchain_community',
         'langchain_chroma',
         'langchain_openai',
+        'pymongo',
         'langchain_text_splitters',
-        'flask-swagger-ui',
         'flask-cors',
-        'psycopg2-binary',
         'motor',
+        'beautifulsoup4',
     ],
 )
