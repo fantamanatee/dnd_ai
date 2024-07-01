@@ -1,5 +1,6 @@
 # USER DEFINED -- BACKEND
 dnd_ai_be/dnd_ai_be/data
+dnd_ai_be/dnd_ai_be/src/test
 
 # USER DEFINED -- FRONTEND
 dnd_ai_fe/package-lock.json

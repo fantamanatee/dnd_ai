@@ -2,14 +2,14 @@ from flask_swagger_ui import get_swaggerui_blueprint
 from flask_cors import CORS
 from flask import Flask
 from dnd_ai_be.src.api_util import query_blueprint
+from dotenv import load_dotenv
 
+load_dotenv()
 
 app = Flask(__name__)
-CORS(app, resources={r"/query": {"origins": [
+CORS(app, resources={r"/*": {"origins": [
     "http://127.0.0.1:8080",
     "http://localhost:8080",
-    "http://127.0.0.1:5000",
-    "http://localhost:5000",
     ]}})  # whitelisted origins
 
 SWAGGER_URL = '/api/docs'

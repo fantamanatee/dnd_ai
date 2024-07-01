@@ -51,18 +51,18 @@ def main():
 
     
 if __name__ == '__main__':
-    main()
-    # # Example NPCs
-    # npc1 = NPC(role="Merchant", name="Gimble", race="Halfling", tags=["Friendly", "Trader"], description="A jovial halfling merchant.")
-    # npc2 = NPC(role="Guard", name="Thorn", race="Human", tags=["Friendly", "Guard", "City Watch"], description="A vigilant human guard.")
+    # main()
+    # Example NPCs
+    npc1 = NPC(role="Merchant", name="Gimble", race="Halfling", tags=["Friendly", "Trader"], description="A jovial halfling merchant.")
+    npc2 = NPC(role="Guard", name="Thorn", race="Human", tags=["Friendly", "Guard", "City Watch"], description="A vigilant human guard.")
 
-    # # Example Players
-    # player1 = Player(player_class="Wizard", level=5, name="Elowen", race="Elf", tags=["Adventurer"], description="A wise elven wizard.")
-    # player2 = Player(player_class="Fighter", level=3, name="Garrick", race="Human", tags=["Mercenary"], description="A skilled human fighter.")
+    # Example Players
+    player1 = Player(player_class="Wizard", level=5, name="Elowen", race="Elf", tags=["Adventurer"], description="A wise elven wizard.")
+    player2 = Player(player_class="Fighter", level=3, name="Garrick", race="Human", tags=["Mercenary"], description="A skilled human fighter.")
 
-    # # Example Entities
-    # entity1 = Entity(race="Dragonborn", tags=["Friendly", "Mythical", "Dragon"], description="A majestic dragonborn warrior.")
-    # entity2 = Entity(race="Human", tags=["Hostile", "Commoner"], description="A humble human villager.")
+    # Example Entities
+    entity1 = Entity(race="Dragonborn", tags=["Friendly", "Mythical", "Dragon"], description="A majestic dragonborn warrior.")
+    entity2 = Entity(race="Human", tags=["Hostile", "Commoner"], description="A humble human villager.")
 
-    # for entity in [npc1, npc2, player1, player2, entity1, entity2]:
-    #     db_insert_one(entity)
+    for entity in [npc1, npc2, player1, player2, entity1, entity2]:
+        db_insert_one(entity)

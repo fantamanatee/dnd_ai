@@ -1,32 +1,31 @@
 {
-    "swagger": "2.0",
-    "info": {
-      "description": "API documentation for the /query endpoint",
-      "version": "1.0.0",
-      "title": "Query API"
-    },
-    "host": "localhost:5000",
-    "basePath": "/",
-    "schemes": [
-      "http"
-    ],
-    "paths": {
-      "/query": {
-        "post": {
-          "summary": "Send a query",
-          "description": "Send a query to the backend and get a response",
-          "consumes": [
-            "application/json"
-          ],
-          "produces": [
-            "application/json"
-          ],
-          "parameters": [
-            {
-              "in": "body",
-              "name": "body",
-              "description": "User input",
-              "required": true,
+  "openapi": "3.0.0",
+  "info": {
+    "description": "API documentation for the /query endpoint",
+    "version": "1.0.0",
+    "title": "Query API"
+  },
+  "host": "localhost:5000",
+  "basePath": "/",
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/query": {
+      "post": {
+        "summary": "Send a query",
+        "description": "Send a query to the backend and get a response",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "requestBody": {
+          "description": "User input",
+          "required": true,
+          "content": {
+            "application/json": {
               "schema": {
                 "type": "object",
                 "properties": {
@@ -49,26 +48,231 @@
                 "required": ["userInput", "FROM_ID", "TO_ID"]
               }
             }
-          ],
-          "responses": {
-            "200": {
-              "description": "A JSON response containing the processed input",
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "message": {
-                    "type": "string",
-                    "description": "The response message"
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "A JSON response containing the processed input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "The response message"
+                    }
                   }
                 }
               }
-            },
-            "400": {
-              "description": "Invalid input"
             }
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        }
+      }
+    },
+    "/player": {
+      "post": {
+        "summary": "Construct a player object",
+        "description": "Create a new player object with the provided details",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "requestBody": {
+          "description": "Player object that needs to be created",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Player"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully created player",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "The response message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        }
+      }
+    },
+    "/npc": {
+      "post": {
+        "summary": "Construct an NPC object",
+        "description": "Create a new NPC object with the provided details",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "requestBody": {
+          "description": "NPC object that needs to be created",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NPC"
+              }
+            }
+          }
+        },   
+        "responses": {
+          "200": {
+            "description": "Successfully created NPC",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "The response message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        }
+      }
+    },
+    "/entity": {
+      "post": {
+        "summary": "Construct an Entity object",
+        "description": "Create a new Entity object with the provided details",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "requestBody": {
+          "description": "Entity object that needs to be created",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Entity"
+              }
+            }
+          }
+        },   
+        "responses": {
+          "200": {
+            "description": "Successfully created Entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "The response message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
           }
         }
       }
     }
+  },
+  "components": {
+    "schemas": {
+      "Entity": {
+        "type": "object",
+        "properties": {
+          "race": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "required": ["race", "tags", "description"]
+      },
+      "Character": {
+        "allOf": [
+          { "$ref": "#/components/schemas/Entity" },
+          {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "required": ["name"]
+      },
+      "NPC": {
+        "allOf": [
+          { "$ref": "#/components/schemas/Character" },
+          {
+            "type": "object",
+            "properties": {
+              "role": {
+                "type": "string"
+              }
+            },
+            "required": ["role"]
+          }
+        ]
+      },
+      "Player": {
+        "allOf": [
+          { "$ref": "#/components/schemas/Character" },
+          {
+            "type": "object",
+            "properties": {
+              "player_class": {
+                "type": "string"
+              },
+              "level": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            "required": ["player_class", "level"]
+          }
+        ]
+      }
+    }
   }
+}
   

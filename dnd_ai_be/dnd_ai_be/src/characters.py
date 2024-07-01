@@ -46,7 +46,7 @@ class Character(Entity):
         '''
         super().__init__(race=race, tags=tags, description=description)
         self.name = name
-        self.lore = ""
+        self.lore = []
         self.memory = []
 
     def add_lore(self, lore_entry):
