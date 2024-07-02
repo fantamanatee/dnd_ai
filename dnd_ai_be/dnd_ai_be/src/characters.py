@@ -50,35 +50,30 @@ class Entity:
         return result.inserted_id
     
     def get_race(self) -> str:
-        return self.col.find_one({'_id': ObjectId(self.ID)})['race']
+        return self.col.find_one({'_id': self.ID})['race']
 
     def set_race(self, race: str) -> None:
-        self.col.update_one({'_id': ObjectId(self.ID)}, {'$set': {'race': race}})
+        self.col.update_one({'_id': self.ID}, {'$set': {'race': race}})
 
     def get_tags(self) -> List[str]:
-        return self.col.find_one({'_id': ObjectId(self.ID)})['tags']
+        return self.col.find_one({'_id': self.ID})['tags']
 
     def set_tags(self, tags: List[str]) -> None:
-        self.col.update_one({'_id': ObjectId(self.ID)}, {'$set': {'tags': tags}})
+        self.col.update_one({'_id': self.ID}, {'$set': {'tags': tags}})
 
     def get_description(self) -> str:
-        return self.col.find_one({'_id': ObjectId(self.ID)})['description']
+        return self.col.find_one({'_id': self.ID})['description']
 
     def set_description(self, description: str) -> None:
-        self.col.update_one({'_id': ObjectId(self.ID)}, {'$set': {'description': description}})
+        self.col.update_one({'_id': self.ID}, {'$set': {'description': description}})
     
     def to_dict(self) -> dict:
-        return self.col.find_one({'_id': ObjectId(self.ID)})
+        return self.col.find_one({'_id': self.ID})
     
-    def to_context_str(self) -> str:
+    def get_context_str(self) -> str:
         ''' Returns a string representation of the entity for prompt context.
         '''
-
-        context = f"""Entity information: \n \
-                    Race: {self.get_race()} \n \
-                    Tags: {self.get_tags()} \n \
-                    Description: {self.get_description()} \n
-                    """
+        context = f"Entity information: \nRace: {self.get_race()} \nTags: {self.get_tags()} \nDescription: {self.get_description()}"
         return context
 
 class Character(Entity):
@@ -119,7 +114,7 @@ class Character(Entity):
         self.wipe_lore()
         self.wipe_memory()
 
-    def to_context_str(self) -> str:
+    def get_context_str(self) -> str:
         ''' Returns a string representation of the entity for prompt context.
         '''
 
