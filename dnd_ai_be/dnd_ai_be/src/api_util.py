@@ -1,5 +1,5 @@
 from flask import request, jsonify, Blueprint, Response
-from dnd_ai_be.src.characters_gutted import NPC, Player, Entity
+from dnd_ai_be.src.characters import NPC, Player, Entity
 
 query_blueprint = Blueprint('query_blueprint', __name__)
 
