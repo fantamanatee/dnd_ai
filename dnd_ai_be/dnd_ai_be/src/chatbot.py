@@ -117,13 +117,6 @@ class Chatbot:
         return answer
 
 
-store = {}
-
-def get_session_history(session_id: str) -> BaseChatMessageHistory:
-    if session_id not in store:
-        store[session_id] = ChatMessageHistory()
-    return store[session_id]
-
 if __name__ == '__main__':
     # first_four_entries = DB.Entities.find({}, '_id').limit(4)
     id1 = ObjectId('66808f6bef8163e460149f49')
