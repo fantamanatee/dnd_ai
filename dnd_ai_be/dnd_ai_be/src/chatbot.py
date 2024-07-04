@@ -12,12 +12,13 @@ from bson import ObjectId
 
 from dnd_ai_be.src.db_util import DB, URI, DB_NAME
 from dnd_ai_be.src.characters import Entity
+from dnd_ai_be.src.util import timer
 
 class Chatbot:
     '''
     Chatbot class that wraps the OpenAI API and provides a simple interface for interacting with it.
     '''
-    def __init__(self, contextualize_q_system_prompt:str, qa_system_prompt:str, config:dict=None, ID:str=None) -> None:
+    def __init__(self, contextualize_q_system_prompt:str=None, qa_system_prompt:str=None, config:dict=None, ID:str=None) -> None:
         ''' Initialize the Chatbot object.
         Args:
             contextualize_q_prompt: A prompt for contextualizing questions.
@@ -31,15 +32,21 @@ class Chatbot:
         } # default config
         if config is None:
             config = DEFAULT_CONFIG
-        
         self.config = config
         self.col = DB.Bots
+        self.history_aware_retriever = None
+        self.rag_chain = None
+        self.session_id = None
 
         if not ID is None:
             if self.col.find_one({"_id": ObjectId(ID)}) is None:
                 raise ValueError("BOT_ID does not exist in database.")
             else:
                 self.ID = ID
+                contextualize_q_system_prompt = self.col.find_one({"_id": ObjectId(ID)})['contextualize_q_system_prompt']
+                qa_system_prompt = self.col.find_one({"_id": ObjectId(ID)})['qa_system_prompt']
+                config = self.col.find_one({"_id": ObjectId(ID)})['config']
+                print('Chatbot loaded with BOT_ID:', ID)
         else:
             ID = self._create_chatbot(contextualize_q_system_prompt, qa_system_prompt, config)
             self.ID = ID
@@ -49,14 +56,13 @@ class Chatbot:
             MessagesPlaceholder("history"),
             ("human", "{input}")
         ])
-        
         self.qa_prompt = ChatPromptTemplate.from_messages([
             ("system", qa_system_prompt),
             MessagesPlaceholder("history"),
             ("human", "{input}"),
         ])
 
-        self.llm = ChatOpenAI(model=self.config['model'], temperature=0)
+        self.llm = ChatOpenAI(model=self.config['model'], temperature=self.config['temperature'])
         self.question_answer_chain = create_stuff_documents_chain(self.llm, self.qa_prompt)
     
     def _create_chatbot(self, contextualize_q_system_prompt:str, qa_system_prompt:str, config:dict=None) -> ObjectId:
@@ -79,40 +85,56 @@ class Chatbot:
             prompter_input: The input for the prompter.
             responder_input: The input for the responder.
         '''
-
-        session_id = str(prompter.ID) + str(responder.ID)
+        print(f"Prompter: {prompter.get_name()}, Responder: {responder.get_name()}")
+        
 
         prompter_context = f"PROMPTER_CONTEXT:\n{prompter.get_context_str()}"   
         responder_context = f"RESPONDER_CONTEXT:\n{responder.get_context_str()}"
 
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
-        splits = text_splitter.create_documents([prompter_context, responder_context])
-        vectorstore = Chroma.from_documents(documents=splits, embedding=OpenAIEmbeddings())
-        retriever = vectorstore.as_retriever()
+        @timer()
+        def create_retriever():
+            text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+            splits = text_splitter.create_documents([prompter_context, responder_context])
+            vectorstore = Chroma.from_documents(documents=splits, embedding=OpenAIEmbeddings())
+            retriever = vectorstore.as_retriever()
+            history_aware_retriever = create_history_aware_retriever(self.llm, retriever, self.contextualize_q_prompt)       
+            return history_aware_retriever
+        
+        if self.history_aware_retriever is None:
+            self.history_aware_retriever =  create_retriever()
 
-        history_aware_retriever = create_history_aware_retriever(self.llm, retriever, self.contextualize_q_prompt)       
-        rag_chain = create_retrieval_chain(history_aware_retriever, self.question_answer_chain)
-
+        @timer()
+        def create_rag_chain(session_id:str):
+            rag_chain = create_retrieval_chain(self.history_aware_retriever, self.question_answer_chain)
+            conversational_rag_chain = RunnableWithMessageHistory(
+                rag_chain,
+                lambda session_id: MongoDBChatMessageHistory(
+                    session_id=session_id,
+                    connection_string=URI,
+                    database_name=DB_NAME,
+                    collection_name="Sessions",
+                ),
+                input_messages_key="input",
+                history_messages_key="history",
+                output_messages_key="answer"
+            )
+            return conversational_rag_chain
+        
+        cur_session_id = str(prompter.ID) + str(responder.ID)
+        if self.session_id is None or self.session_id != cur_session_id:
+            self.session_id = cur_session_id
+            conversational_rag_chain = create_rag_chain(cur_session_id)
     
-        conversational_rag_chain = RunnableWithMessageHistory(
-            rag_chain,
-            lambda session_id: MongoDBChatMessageHistory(
-                session_id=session_id,
-                connection_string=URI,
-                database_name=DB_NAME,
-                collection_name="Sessions",
-            ),
-            input_messages_key="input",
-            history_messages_key="history",
-            output_messages_key="answer"
-        )
-        res = conversational_rag_chain.invoke(
-            {"input": input},
-            config = {"configurable": {"session_id": session_id}}
-        )
-
+        @timer()
+        def do_invoke():
+            res = conversational_rag_chain.invoke(
+                {"input": input},
+                config = {"configurable": {"session_id": cur_session_id}}
+            )
+            return res
+        
+        res = do_invoke()
         answer = res["answer"]
-        # chat_history = res["history"]
 
         return answer
 
