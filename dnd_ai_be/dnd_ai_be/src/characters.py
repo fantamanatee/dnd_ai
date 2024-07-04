@@ -3,13 +3,11 @@ from typing import List
 import json
 import os
 from bson import ObjectId
-from flask import Blueprint
 
 URI = f"mongodb+srv://{os.getenv('DND_AI_DB_USER')}:{os.getenv('DND_AI_DB_PWD')}@cluster91339.czkmuen.mongodb.net/?appName=Cluster91339"
 CLIENT = MongoClient(URI)
 DB_NAME = 'test_db'
 DB = CLIENT[DB_NAME]
-
 
 class Entity:
     '''
@@ -18,7 +16,7 @@ class Entity:
     This class has no local variables except for ID. All other CRUD operations are 
         handled by the database.
     '''
-    def __init__(self, race:str=None, tags: List[str]=None, description: str=None, ID:ObjectId=None):
+    def __init__(self, race:str=None, tags: List[str]=[], description: str=None, ID:str=None):
         ''' Initialize a new entity, either by creating a new entry in the database or by
         retrieving an existing entry. 
         This may be called with only the ID argument or with all arguments except ID.
@@ -26,11 +24,12 @@ class Entity:
             Entity(ID=ObjectId('66808f6bef8163e460149f49'))
             Entity(race,tags,description)
         '''
+        ID = ObjectId(ID) if ID else None
         self.col = DB.Entities 
 
         if not ID is None:
-            if self.col.find_one({"_id": ObjectId(ID)}) is None:
-                raise ValueError("ID does not exist in database.")
+            if self.col.find_one({"_id": ID}) is None:
+                raise ValueError(f"ID {ID} does not exist in {self.col.database.name}.{self.col.name}.")
             else:
                 self.ID = ID
         else:
@@ -42,6 +41,9 @@ class Entity:
             result = self.col.insert_one(data)
             self.ID = result.inserted_id        
     
+    def get_name(self) -> str:
+        return self.get_race()
+
     def get_race(self) -> str:
         return self.col.find_one({'_id': self.ID})['race']
 
@@ -98,7 +100,7 @@ class Character(Entity):
 
     
 class NPC(Character):
-    def __init__(self, role:str, name:str, race:str, tags:List[str], description:str, ID:ObjectId=None):
+    def __init__(self, role:str=None, name:str=None, race:str=None, tags:List[str]=[], description:str=None, ID:str=None):
         '''
         Initialize a new NPC, either by creating a new entry in the database or by
         retrieving an existing entry.
@@ -107,12 +109,13 @@ class NPC(Character):
             NPC(ID=ObjectId('66808f6bef8163e460149f49'))
             NPC(role, name, race, tags, description)
         '''
-        self.col = DB.NPC 
+        ID = ObjectId(ID) if ID else None
+        self.col = DB.NPCs
 
         if not ID is None:
-            obj = self.col.find_one({"_id": ObjectId(ID)})
+            obj = self.col.find_one({"_id": ID})
             if obj is None:
-                raise ValueError("ID does not exist in database.")
+                raise ValueError(f"ID {ID} does not exist in {self.col.database.name}.{self.col.name}.")
             self.ID = ID
         else:
             data = {
@@ -140,7 +143,7 @@ class NPC(Character):
 
 
 class Player(Character):
-    def __init__(self, player_class:str, level:int , name:str, race:str, tags:List[str], description:str, ID:ObjectId=None):
+    def __init__(self, player_class:str=None, level:int=None, name:str=None, race:str=None, tags:List[str]=[], description:str=None, ID:str=None):
         '''
         Initialize a new Player, either by creating a new entry in the database or by
         retrieving an existing entry.
@@ -149,12 +152,13 @@ class Player(Character):
             Player(ID=ObjectId('66808f6bef8163e460149f49'))
             Player(player_class, level, name, race, tags, description)
         '''
-        self.col = DB.Player 
+        ID = ObjectId(ID) if ID else None
+        self.col = DB.Players 
 
         if not ID is None:
-            obj = self.col.find_one({"_id": ObjectId(ID)})
+            obj = self.col.find_one({"_id": ID})
             if obj is None:
-                raise ValueError("ID does not exist in database.")
+                raise ValueError(f"ID {ID} does not exist in {self.col.database.name}.{self.col.name}.")
             self.ID = ID
         else:
             data = {
