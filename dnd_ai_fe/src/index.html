@@ -26,11 +26,17 @@
 
   <section>
     <div>
+      <select id="prompterSelect" name="prompter" class="entitylikeDropdown">
+        <option value="">Select Prompter</option>
+      </select>
+      <select id="responderSelect" name="responder" class="entitylikeDropdown">
+        <option value="">Select Responder</option>
+      </select>
+
       <label for="userInput">Enter Text:</label>
       <input type="text" id="userInput" name="userInput">
-      <input type="text" id="FROM_ID" name="FROM_ID">
-      <input type="text" id="TO_ID" name="TO_ID">
-      <button id="sendQueryButton">Send Query</button>
+
+      <button id="sendPromptButton">Send Prompt</button>
     </div>
     <div id="response"></div>   
   </section>
