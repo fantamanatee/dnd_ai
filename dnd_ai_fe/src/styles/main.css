@@ -120,6 +120,23 @@ button:hover {
     color: var(--response-text);
 }
 
+textarea {
+    width: calc(100% - 22px);
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid var(--input-border);
+    border-radius: 4px;
+    background-color: var(--input-background);
+    color: var(--input-text);
+    height: 150px; /* Adjust height as needed */
+}
+
+textarea:focus {
+    outline: none;
+    border-color: var(--button-background); /* Example focus color */
+}
+
+
 /* Light mode */
 :root {
     --background-color: #f4f4f9;

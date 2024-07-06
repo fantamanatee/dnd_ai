@@ -1,117 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <link rel="stylesheet" href="styles/main.css">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Home - D&D AI</title>
-</head>
-<body>
-  <header>
-    <h1>DnD AI</h1>
-    <button id="themeToggle">Toggle Dark/Light</button>
+  <head>
+    <link rel="stylesheet" href="styles/main.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home - D&D AI</title>
+  </head>
+  <body>
+    <header>
+      <h1>DnD AI</h1>
+      <button id="themeToggle">Toggle Dark/Light</button>
 
-    <nav>
-      <ul>
-        <li><a href="#" data-page="home">Home</a></li>
-        <li><a href="#" data-page="character-builder">Character Builder</a></li>
-        <li><a href="#" data-page="bot-builder">Bot Builder</a></li>
-      </ul>
-    </nav>
-  </header>
-  
-  <main id="main-content">
-    <!-- Content will be dynamically rendered here -->
-    <section id="home">
-      <h2>Author</h2>
-      <p>Aaron Su -- suaaron.work@gmail.com</p>
-    
-      <h2>Description</h2>
-      <p>
-          Powered by LLMs and LangChain. <br>
-          Designed for DnD Players and Dungeon Masters. <br>
-          Dnd AI provides a toolkit for complex NPC interactions, character building, and more.
-      </p>
+      <nav>
+        <ul>
+          <li><a href="#" data-page="home">Home</a></li>
+          <li>
+            <a href="#" data-page="character-builder">Character Builder</a>
+          </li>
+          <li><a href="#" data-page="bot-builder">Bot Builder</a></li>
+        </ul>
+      </nav>
+    </header>
 
-      <div>
-        <label for="prompterSelect">Prompter:</label>
-        <select id="prompterSelect" name="prompter" class="entitylikeDropdown">
-          <option value="">Select Prompter</option>
-        </select>
-        <label for="responderSelect">Responder:</label>
-        <select id="responderSelect" name="responder" class="entitylikeDropdown">
-          <option value="">Select Responder</option>
-        </select>
+    <main id="main-content">
+      <!-- Content will be dynamically rendered here -->
+      <section id="home">
+        <h2>Author</h2>
+        <p>Aaron Su -- suaaron.work@gmail.com</p>
 
-        <label for="userInput">Enter Text:</label>
-        <input type="text" id="userInput" name="userInput">
+        <h2>Description</h2>
+        <p>
+          Powered by LLMs and LangChain. <br />
+          Designed for DnD Players and Dungeon Masters. <br />
+          Dnd AI provides a toolkit for complex NPC interactions, character
+          building, and more.
+        </p>
 
-        <button id="sendPromptButton">Send Prompt</button>
-      </div>
-      <div id="response"></div>   
-    </section>
-  </main>
+        <div>
+          <label for="prompterSelect">Prompter:</label>
+          <select
+            id="prompterSelect"
+            name="prompter"
+            class="entitylikeDropdown"
+          >
+            <option value="">Select Prompter</option>
+          </select>
+          <label for="responderSelect">Responder:</label>
+          <select
+            id="responderSelect"
+            name="responder"
+            class="entitylikeDropdown"
+          >
+            <option value="">Select Responder</option>
+          </select>
 
-  <script src="dist/bundle.js"></script>
-</body>
+          <label for="userInput">Enter Text:</label>
+          <input type="text" id="userInput" name="userInput" />
+
+          <button id="sendPromptButton">Send Prompt</button>
+        </div>
+        <div id="response"></div>
+      </section>
+    </main>
+
+    <script src="dist/bundle.js"></script>
+  </body>
 </html>
-
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-  <link rel="stylesheet" href="styles/main.css">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Home - D&D AI</title>
-</head>
-<body>
-  <header>
-    <h1>DnD AI</h1>
-    <button id="themeToggle">Toggle Dark/Light</button>
-
-    <nav>
-      <ul>
-        <li><a href="index.html">Home</a></li>
-        <li><a href="character-builder.html">Character Builder</a></li>
-        <li><a href="bot-builder.html">Bot Builder</a></li>
-      </ul>
-    </nav>
-
-  </header>
-  
-  <section>
-    <h2>Author</h2>
-    <p>Aaron Su -- suaaron.work@gmail.com</p>
-  </section>
-  
-  <section>
-    <h2>Description</h2>
-    <p>
-        Powered by LLMs and LangChain. <br>
-        Designed for DnD Players and Dungeon Masters. <br>
-        Dnd AI provides a toolkit for complex NPC interactions, character building, and more.
-    </p>
-  </section>
-
-  <section>
-    <div>
-      <label for="prompterSelect">Prompter:</label>
-      <select id="prompterSelect" name="prompter" class="entitylikeDropdown">
-        <option value="">Select Prompter</option>
-      </select>
-      <label for="responderSelect">Responder:</label>
-      <select id="responderSelect" name="responder" class="entitylikeDropdown">
-        <option value="">Select Responder</option>
-      </select>
-
-      <label for="userInput">Enter Text:</label>
-      <input type="text" id="userInput" name="userInput">
-
-      <button id="sendPromptButton">Send Prompt</button>
-    </div>
-    <div id="response"></div>   
-  </section>
-
-  <script src="dist/bundle.js"></script>
-</body>
-</html> -->
