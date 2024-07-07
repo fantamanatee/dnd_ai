@@ -1,4 +1,4 @@
-import { DropdownItem, EntityLike, Entity, NPC, Player } from "./interface";
+import { DropdownItem, EntityLike, Entity, NPC, Player, Bot } from "./interface";
 
 export function populateAppendDropdown(
   dropdown: HTMLSelectElement,
@@ -14,10 +14,10 @@ export function populateAppendDropdown(
   });
 }
 
-export function convertToDropdownItem(entity: EntityLike): DropdownItem {
+export function convertToDropdownItem(obj: any): DropdownItem {
   return {
-    value: entity._id,
-    text: entity.name,
+    value: obj._id,
+    text: obj.name,
   };
 }
 
@@ -90,3 +90,20 @@ export function validatePlayer(obj: any): Player {
     throw new Error('Invalid Player format.');
   }
 }
+/**
+ * Validates if an object conforms to the Bot interface.
+ * @param {any} obj - The object to validate.
+ * @returns {Bot} - The validated Entity.
+ * @throws Will throw an error with specific type check failures if validation fails.
+ */
+export function validateBot(obj: any): Bot {
+  if (!obj) throw new Error('Invalid Bot format: Missing object');
+  if (typeof obj.name !== 'string') throw new Error('Invalid Bot format: name must be a string');
+  if (typeof obj.contextualize_q_system_prompt !== 'string') throw new Error('Invalid Bot format: contextualize_q_system_prompt must be a string');
+  if (typeof obj.qa_system_prompt !== 'string') throw new Error('Invalid Bot format: qa_system_prompt must be a string');
+  if (typeof obj.config !== 'object') throw new Error('Invalid Bot format: config must be an object');
+  if (typeof obj.config.model !== 'string') throw new Error('Invalid Bot format: config.model must be a string');
+  if (typeof obj.config.temperature !== 'number') throw new Error('Invalid Bot format: config.temperature must be a number');
+  return obj as Bot;
+}
+

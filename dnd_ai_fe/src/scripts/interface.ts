@@ -4,6 +4,11 @@ export interface EntityLike {
   type: string;
 }
 
+export interface BotLike {
+    _id: string;
+    name: string;
+    type: string;
+}
 export interface Entity {
   _id?: string;
   race: string;
@@ -24,10 +29,21 @@ export interface Player extends Entity {
   lore: string[];
 }
 
+export interface Bot {
+  _id?: string;
+  name: string;
+  contextualize_q_system_prompt: string;
+  config: {
+    model: string;
+    temperature: number;
+  };
+}
+
 export interface PromptData {
   userInput: string;
   prompter: EntityLike;
   responder: EntityLike;
+  bot: BotLike;
 }
 
 export interface DropdownItem {
