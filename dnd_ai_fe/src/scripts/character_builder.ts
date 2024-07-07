@@ -165,14 +165,12 @@ export async function handleSendCreateCharacter(): Promise<void> {
 function setupCharacterBuilder() {
   console.log("setupCharacterBuilder called");
 
-  const entityLikeDropDown = document.getElementById("entityLikeTypeSelect") as HTMLSelectElement;
+  const entityLikeTypeSelect = document.getElementById("entityLikeTypeSelect") as HTMLSelectElement;
   const userInput = document.getElementById("userInput") as HTMLTextAreaElement;
-  userInput.disabled = true; 
 
   loadEntityLikeTypeSelect();
-  entityLikeDropDown.addEventListener("change", function() {
-    userInput.disabled = false;
-    switch (entityLikeDropDown.value) {
+  entityLikeTypeSelect.addEventListener("change", function() {
+    switch (entityLikeTypeSelect.value) {
         case "entity":
             userInput.value = JSON.stringify(exampleEntity, null, 2);
             break;
@@ -183,8 +181,7 @@ function setupCharacterBuilder() {
             userInput.value = JSON.stringify(examplePlayer, null, 2);
             break;
         default:
-            userInput.value = "";
-            userInput.disabled = true;
+            console.error("Invalid Entity Type selected.");
     }
   });
 
