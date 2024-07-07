@@ -7,5 +7,6 @@ export const API_ENDPOINTS = {
   NPC: `${BASE_URL}/npc`,
   PLAYER: `${BASE_URL}/player`,
   ALL: `${BASE_URL}/all`,
+  BOT: `${BASE_URL}/bot`
   // Add more endpoints as needed
 };
