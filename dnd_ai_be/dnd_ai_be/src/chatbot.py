@@ -18,7 +18,7 @@ class Chatbot:
     '''
     Chatbot class that wraps the OpenAI API and provides a simple interface for interacting with it.
     '''
-    def __init__(self, contextualize_q_system_prompt:str=None, qa_system_prompt:str=None, config:dict=None, ID:str=None) -> None:
+    def __init__(self, name:str=None, contextualize_q_system_prompt:str=None, qa_system_prompt:str=None, config:dict=None, ID:str=None) -> None:
         ''' Initialize the Chatbot object.
         Args:
             contextualize_q_prompt: A prompt for contextualizing questions.
@@ -26,10 +26,13 @@ class Chatbot:
             config: A ChatbotConfig object containing the configuration for the chatbot.
             ID: A unique identifier for the chatbot.
         '''
+        ID = ObjectId(ID) if ID else None
         DEFAULT_CONFIG = {
             "model": "gpt-3.5-turbo",
             "temperature": 0,
         } # default config
+
+        self.name = name
         if config is None:
             config = DEFAULT_CONFIG
         self.config = config
@@ -48,8 +51,14 @@ class Chatbot:
                 config = self.col.find_one({"_id": ObjectId(ID)})['config']
                 print('Chatbot loaded with BOT_ID:', ID)
         else:
-            ID = self._create_chatbot(contextualize_q_system_prompt, qa_system_prompt, config)
-            self.ID = ID
+            chatbot_data = {
+            'name': name,
+            'contextualize_q_system_prompt': contextualize_q_system_prompt,
+            'qa_system_prompt': qa_system_prompt,
+            'config': config
+            }
+            result = self.col.insert_one(chatbot_data)
+            self.ID = result.inserted_id
 
         self.contextualize_q_prompt = ChatPromptTemplate.from_messages([
             ("system", contextualize_q_system_prompt),
@@ -65,19 +74,9 @@ class Chatbot:
         self.llm = ChatOpenAI(model=self.config['model'], temperature=self.config['temperature'])
         self.question_answer_chain = create_stuff_documents_chain(self.llm, self.qa_prompt)
     
-    def _create_chatbot(self, contextualize_q_system_prompt:str, qa_system_prompt:str, config:dict=None) -> ObjectId:
-        ''' Create a new chatbot in the database.
 
-        Returns:
-            The ID of the inserted chatbot.
-        '''
-        chatbot_data = {
-            'contextualize_q_system_prompt': contextualize_q_system_prompt,
-            'qa_system_prompt': qa_system_prompt,
-            'config': config
-        }
-        result = self.col.insert_one(chatbot_data)
-        return result.inserted_id
+    def get_name(self) -> str:
+        return self.col.find_one({'_id': self.ID})['name']
     
     def qa(self, input:str, prompter:Entity, responder:Entity) -> str:
         ''' Perform QA chain. 
@@ -135,35 +134,14 @@ class Chatbot:
         
         res = do_invoke()
         answer = res["answer"]
-
         return answer
+
+    def to_dict(self):
+        data = self.col.find_one({'_id': self.ID})
+        return data
 
 
 if __name__ == '__main__':
-    # first_four_entries = DB.Entities.find({}, '_id').limit(4)
-    id1 = ObjectId('66808f6bef8163e460149f49')
-    id2 = ObjectId('668098230301684548252e44')
-    id3 = ObjectId('6680991c899dbda52bf7b486')
-    id4 = ObjectId('6680a731800bcda61b3c9b06')
-
-    contextualize_q_system_prompt = "Given a chat history and the latest prompt which might reference context in the chat history, formulate a standalone prompt which can be understood without the chat history. Do NOT answer the prompt, just reformulate it if needed and otherwise return it as is."
-    qa_system_prompt = "You are a role playing chatbot for a Dungeons and Dragons game. There are two fictional characters: a prompter and a responder. You must respond to the prompt as if you are the responder. Use the following pieces of retrieved context to answer the prompt. If the context does not apply, respond in a way that makes sense. Use three sentences maximum, and keep the answer concise.\n\n{context}"
-    
-    # Init Existing Entity1, Entity2
-    entity1 = Entity(ID=id1)
-    entity2 = Entity(ID=id2)
-
-    print(entity1.to_dict())
-    print(entity2.to_dict())
-
-    # create a new chatbot
-    bot = Chatbot(contextualize_q_system_prompt, qa_system_prompt, ID=None)
-    print(f"created bot with BOT_ID {bot.ID}")
-
-    # Start QAChain
-    description1 = entity1.get_description()
-    description2 = entity2.get_description()
-    while True:
-        userInput = input(f"You are {description1} What would you like to ask {description2}?\n")
-        answer = bot.qa(userInput, entity1, entity2)
-        print('ANSWER:', answer)
+    bot = Chatbot(ID='66860333855efbe743f85ad1')
+    print(bot.to_dict())
+    print(bot.get_name())
