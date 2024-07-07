@@ -1,15 +1,12 @@
 from pymongo import MongoClient
 from typing import List
-import json
 import os
 from bson import ObjectId
-from flask import Blueprint
 
 URI = f"mongodb+srv://{os.getenv('DND_AI_DB_USER')}:{os.getenv('DND_AI_DB_PWD')}@cluster91339.czkmuen.mongodb.net/?appName=Cluster91339"
 CLIENT = MongoClient(URI)
 DB_NAME = 'test_db'
 DB = CLIENT[DB_NAME]
-
 
 class Entity:
     '''
@@ -18,7 +15,7 @@ class Entity:
     This class has no local variables except for ID. All other CRUD operations are 
         handled by the database.
     '''
-    def __init__(self, race:str=None, tags: List[str]=None, description: str=None, ID:ObjectId=None):
+    def __init__(self, race:str=None, tags: List[str]=[], description: str=None, ID:str=None):
         ''' Initialize a new entity, either by creating a new entry in the database or by
         retrieving an existing entry. 
         This may be called with only the ID argument or with all arguments except ID.
@@ -26,11 +23,12 @@ class Entity:
             Entity(ID=ObjectId('66808f6bef8163e460149f49'))
             Entity(race,tags,description)
         '''
+        ID = ObjectId(ID) if ID else None
         self.col = DB.Entities 
 
         if not ID is None:
-            if self.col.find_one({"_id": ObjectId(ID)}) is None:
-                raise ValueError("ID does not exist in database.")
+            if self.col.find_one({"_id": ID}) is None:
+                raise ValueError(f"ID {ID} does not exist in {self.col.database.name}.{self.col.name}.")
             else:
                 self.ID = ID
         else:
@@ -42,6 +40,9 @@ class Entity:
             result = self.col.insert_one(data)
             self.ID = result.inserted_id        
     
+    def get_name(self) -> str:
+        return self.get_race()
+
     def get_race(self) -> str:
         return self.col.find_one({'_id': self.ID})['race']
 
@@ -59,9 +60,6 @@ class Entity:
 
     def set_description(self, description: str) -> None:
         self.col.update_one({'_id': self.ID}, {'$set': {'description': description}})
-    
-    def to_dict(self) -> dict:
-        return self.col.find_one({'_id': self.ID})
     
     def get_context_str(self) -> str:
         ''' Returns a string representation of the entity for prompt context.
@@ -98,21 +96,22 @@ class Character(Entity):
 
     
 class NPC(Character):
-    def __init__(self, role:str, name:str, race:str, tags:List[str], description:str, ID:ObjectId=None):
+    def __init__(self, role:str=None, name:str=None, lore:List[str]=[], race:str=None, tags:List[str]=[], description:str=None, ID:str=None):
         '''
         Initialize a new NPC, either by creating a new entry in the database or by
         retrieving an existing entry.
         This may be called with only the ID argument or with all arguments except ID.
         Ex: 
             NPC(ID=ObjectId('66808f6bef8163e460149f49'))
-            NPC(role, name, race, tags, description)
+            NPC(role, name, lore, race, tags, description)
         '''
-        self.col = DB.NPC 
+        ID = ObjectId(ID) if ID else None
+        self.col = DB.NPCs
 
         if not ID is None:
-            obj = self.col.find_one({"_id": ObjectId(ID)})
+            obj = self.col.find_one({"_id": ID})
             if obj is None:
-                raise ValueError("ID does not exist in database.")
+                raise ValueError(f"ID {ID} does not exist in {self.col.database.name}.{self.col.name}.")
             self.ID = ID
         else:
             data = {
@@ -121,7 +120,7 @@ class NPC(Character):
                 'race': race,
                 'tags': tags,
                 'description': description,
-                'lore': []
+                'lore': lore
             }
             result = self.col.insert_one(data)
             self.ID = result.inserted_id
@@ -140,21 +139,22 @@ class NPC(Character):
 
 
 class Player(Character):
-    def __init__(self, player_class:str, level:int , name:str, race:str, tags:List[str], description:str, ID:ObjectId=None):
+    def __init__(self, player_class:str=None, level:int=None, name:str=None, lore:List[str]=[], race:str=None, tags:List[str]=[], description:str=None, ID:str=None):
         '''
         Initialize a new Player, either by creating a new entry in the database or by
         retrieving an existing entry.
         This may be called with only the ID argument or with all arguments except ID.
         Ex: 
             Player(ID=ObjectId('66808f6bef8163e460149f49'))
-            Player(player_class, level, name, race, tags, description)
+            Player(player_class, level, name, lore, race, tags, description)
         '''
-        self.col = DB.Player 
+        ID = ObjectId(ID) if ID else None
+        self.col = DB.Players 
 
         if not ID is None:
-            obj = self.col.find_one({"_id": ObjectId(ID)})
+            obj = self.col.find_one({"_id": ID})
             if obj is None:
-                raise ValueError("ID does not exist in database.")
+                raise ValueError(f"ID {ID} does not exist in {self.col.database.name}.{self.col.name}.")
             self.ID = ID
         else:
             data = {
@@ -164,7 +164,7 @@ class Player(Character):
                 'race': race,
                 'tags': tags,
                 'description': description,
-                'lore': []
+                'lore': lore,
             }
             result = self.col.insert_one(data)
             self.ID = result.inserted_id
@@ -186,41 +186,7 @@ class Player(Character):
 
 
 if __name__ == '__main__':
-    npc = NPC(role="Merchant", name="Gim", race="Halfling", tags=["Friendly", "Trader"], description="A jovial halfling merchant.")
-    npc.add_lore("Gim is known for his excellent prices. His brother is a famous bard who writes songs about their adventures.")
-    npc.add_lore("Gim has a secret stash of rare items hidden in his shop.")
-    print(npc.get_lore())
-    print(npc.get_context_str())
-    npc.wipe_lore()
-    print(npc.get_lore())
-
-    player = Player(player_class="Wizard", level=5, name="El", race="Elf", tags=["Adventurer"], description="A wise elven wizard.")
-    player.add_lore("El is a member of the Arcane Order, a group of powerful wizards who protect the realm.")
-    player.add_lore("El is searching for a lost artifact that could change the course of history.")
-    print(player.get_lore())
-    print(player.get_context_str())
-    player.wipe_lore()
-    print(player.get_lore())
+    pass
+  
     
-    # entity1 = Entity(race="Dragonborn", tags=["Friendly", "Mythical", "Dragon"], description="A majestic dragonborn warrior.")
-
-
-    # # SPEED TEST #
-    # # Test setters and getters
-    # print("Original entity:")
-    # print(f"Race: {entity1.get_race()}")
-    # print(f"Tags: {entity1.get_tags()}")
-    # print(f"Description: {entity1.get_description()}")
-
-    # for i in range(100):
-    #     # Modify attributes using setters
-    #     entity1.set_race(f"Elf{i}")
-    #     entity1.set_tags([f"Graceful{i}", f"Forest{i}", f"Elf{i}"])
-    #     entity1.set_description(f"An agile and wise elf of the forest.{i}")
-    #     print('.', end='')
-
-    # # Test getters again after modification
-    # print("\nModified entity:")
-    # print(f"Race: {entity1.get_race()}")
-    # print(f"Tags: {entity1.get_tags()}")
-    # print(f"Description: {entity1.get_description()}")
+   

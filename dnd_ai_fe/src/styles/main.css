@@ -1,0 +1,180 @@
+/* main.css */
+
+/* Base styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    transition: background-color 0.3s, color 0.3s;
+}
+
+header {
+    font-family: Arial, sans-serif;
+    background-color: var(--header-background);
+    color: var(--header-text);
+    padding: 1rem;
+    text-align: center;
+    position: relative;
+}
+
+header button {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    background-color: var(--button-background);
+    color: var(--button-text);
+    cursor: pointer;
+}
+
+header button:hover {
+    background-color: var(--button-hover-background);
+}
+
+nav ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+  
+nav ul li {
+    display: inline;
+    margin-right: 20px;
+}
+  
+nav ul li a {
+    color: #fff;
+    text-decoration: none;
+}
+  
+nav ul li a:hover {
+    text-decoration: underline;
+}
+
+h1, h2 {
+    margin: 0.5rem 0;
+}
+
+section {
+    padding: 1rem;
+    border-bottom: 1px solid var(--section-border);
+}
+
+p {
+    margin: 0.5rem 0;
+}
+
+div {
+    margin-top: 1rem;
+}
+
+label {
+    display: block;
+    margin: 0.5rem 0 0.2rem 0;
+}
+
+input[type="text"] {
+    width: calc(100% - 22px);
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid var(--input-border);
+    border-radius: 4px;
+    background-color: var(--input-background);
+    color: var(--input-text);
+}
+
+select {
+    width: calc(100% - 22px);
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid var(--select-border);
+    border-radius: 4px;
+    background-color: var(--select-background);
+    color: var(--select-text);
+}
+
+button {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    background-color: var(--button-background);
+    color: var(--button-text);
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: var(--button-hover-background);
+}
+
+#response {
+    margin-top: 1rem;
+    padding: 1rem;
+    border: 1px solid var(--response-border);
+    border-radius: 4px;
+    background-color: var(--response-background);
+    color: var(--response-text);
+}
+
+textarea {
+    width: calc(100% - 22px);
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid var(--input-border);
+    border-radius: 4px;
+    background-color: var(--input-background);
+    color: var(--input-text);
+    height: 150px; /* Adjust height as needed */
+}
+
+textarea:focus {
+    outline: none;
+    border-color: var(--button-background); /* Example focus color */
+}
+
+
+/* Light mode */
+:root {
+    --background-color: #f4f4f9;
+    --text-color: #333;
+    --header-background: #4CAF50;
+    --header-text: #fff;
+    --section-border: #ddd;
+    --input-border: #ccc;
+    --input-background: #fff;
+    --input-text: #333;
+    --select-border: #ccc;
+    --select-background: #fff;
+    --select-text: #333;
+    --button-background: #4CAF50;
+    --button-text: #fff;
+    --button-hover-background: #45a049;
+    --response-border: #ccc;
+    --response-background: #fff;
+    --response-text: #333;
+}
+
+/* Dark mode */
+body.dark-mode {
+    --background-color: #2d2a3e;
+    --text-color: #c5c3da;
+    --header-background: #1f1d29;
+    --header-text: #c5c3da;
+    --section-border: #4b465e;
+    --input-border: #5c5776;
+    --input-background: #3a354b;
+    --input-text: #c5c3da;
+    --select-border: #5c5776;
+    --select-background: #3a354b;
+    --select-text: #c5c3da;
+    --button-background: #7d4fc0;
+    --button-text: #f1d4ff;
+    --button-hover-background: #9160d1;
+    --response-border: #5c5776;
+    --response-background: #3a354b;
+    --response-text: #c5c3da;
+  }

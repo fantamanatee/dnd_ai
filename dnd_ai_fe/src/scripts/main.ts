@@ -1,44 +1,47 @@
+import { renderHome } from "./home";
+import { renderBotBuilder } from "./bot_builder";
+import { renderCharacterBuilder } from "./character_builder";
 
-export async function sendQuery() {
-  /**
-   * Sends a query to the server with user input and displays the response.
-   * 
-   * This sends user input to a server endpoint via a POST request.
-   * The server's response is then displayed on the webpage.
-   * 
-   * @async
-   * @function sendQuery
-   * @returns {Promise<void>}
-   */
-  try {
-    const userInput = (<HTMLInputElement>document.getElementById('userInput')).value;
-    const FROM_ID = (<HTMLInputElement>document.getElementById('FROM_ID')).value;
-    const TO_ID = (<HTMLInputElement>document.getElementById('TO_ID')).value;
-    const url = 'http://localhost:5000/query'; 
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        FROM_ID: FROM_ID,
-        TO_ID: TO_ID,
-        userInput: userInput,
-      })
-    });
-    const data = await response.json();
-    document.getElementById('response')!.innerText = data.message;
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  }
+// Router function to handle navigation
+function handleNavigation(event: Event) {
+  event.preventDefault();
+  const target = event.target as HTMLAnchorElement;
+  const page = target.getAttribute("data-page");
 
-// Add event listener for DOMContentLoaded 
-document.addEventListener('DOMContentLoaded', () => {
-  const sendQueryButton = document.getElementById('sendQueryButton');
-  if (sendQueryButton) {
-    sendQueryButton.addEventListener('click', sendQuery);
+  if (page === "home") {
+    renderHome();
+  } else if (page === "character-builder") {
+    renderCharacterBuilder();
+  } else if (page === "bot-builder") {
+    renderBotBuilder();
   } else {
-    console.error('Button with ID "sendQueryButton" not found.');
+    console.error("Page not found");
   }
+}
+
+// Listen for link clicks in the navigation.
+document.querySelectorAll("nav a").forEach((link) => {
+  link.addEventListener("click", handleNavigation);
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  const themeToggle = document.getElementById("themeToggle");
+  // Optionally, check for saved preference in localStorage
+  if (localStorage.getItem("theme") === "dark") {
+    document.body.classList.add("dark-mode");
+  }
+
+  themeToggle!.addEventListener("click", () => {
+    document.body.classList.toggle("dark-mode");
+    // Save preference to localStorage
+    if (document.body.classList.contains("dark-mode")) {
+      localStorage.setItem("theme", "dark");
+    } else {
+      localStorage.setItem("theme", "light");
+    }
+  });
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  renderHome();
 });

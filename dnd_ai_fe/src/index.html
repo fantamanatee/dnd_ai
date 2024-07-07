@@ -1,42 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Simple HTML Page</title>
-</head>
-<body>
-  <header>
-    <h1>DnD AI</h1>
-  </header>
-  
-  <section>
-    <h2>Author</h2>
-    <p>Aaron Su -- suaaron.work@gmail.com</p>
-  </section>
-  
-  <section>
-    <h2>Description</h2>
-    <p>
-        Powered by LLMs and LangChain. <br>
-        Designed for DnD players and Dungeon Masters. <br>
-        Dnd AI provides a toolkit for complex NPC interactions, character building, and more.
-    </p>
-  </section>
+  <head>
+    <link rel="stylesheet" href="styles/main.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home - D&D AI</title>
+  </head>
+  <body>
+    <header>
+      <h1>DnD AI</h1>
+      <button id="themeToggle">Toggle Dark/Light</button>
 
-  <section>
-    <div>
-      <label for="userInput">Enter Text:</label>
-      <input type="text" id="userInput" name="userInput">
-      <input type="text" id="FROM_ID" name="FROM_ID">
-      <input type="text" id="TO_ID" name="TO_ID">
-      <button id="sendQueryButton">Send Query</button>
-    </div>
-    <div id="response"></div>   
-  </section>
+      <nav>
+        <ul>
+          <li><a href="#" data-page="home">Home</a></li>
+          <li>
+            <a href="#" data-page="character-builder">Character Builder</a>
+          </li>
+          <li><a href="#" data-page="bot-builder">Bot Builder</a></li>
+        </ul>
+      </nav>
+    </header>
 
-  <script src="dist/bundle.js"></script>
-  
+    <main id="main-content">
+      <!-- Content will be dynamically rendered here -->
+      <section id="home">
+        <h2>Author</h2>
+        <p>Aaron Su -- suaaron.work@gmail.com</p>
 
-</body>
+        <h2>Description</h2>
+        <p>
+          Powered by LLMs and LangChain. <br />
+          Designed for DnD Players and Dungeon Masters. <br />
+          Dnd AI provides a toolkit for complex NPC interactions, character
+          building, and more.
+        </p>
+
+        <div>
+          <label for="prompterSelect">Prompter:</label>
+          <select
+            id="prompterSelect"
+            name="prompter"
+            class="entitylikeDropdown"
+          >
+            <option value="">Select Prompter</option>
+          </select>
+          <label for="responderSelect">Responder:</label>
+          <select
+            id="responderSelect"
+            name="responder"
+            class="entitylikeDropdown"
+          >
+            <option value="">Select Responder</option>
+          </select>
+
+          <label for="userInput">Enter Text:</label>
+          <input type="text" id="userInput" name="userInput" />
+
+          <button id="sendPromptButton">Send Prompt</button>
+        </div>
+        <div id="response"></div>
+      </section>
+    </main>
+
+    <script src="dist/bundle.js"></script>
+  </body>
 </html>
