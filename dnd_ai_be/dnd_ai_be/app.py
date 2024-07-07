@@ -14,6 +14,7 @@ CORS(app, resources={r"/*": {"origins": [
     "http://localhost:5000",
     ]}})  # whitelisted origins
 
+
 SWAGGER_URL = '/api/docs'
 API_URL = '/static/swagger.json'
 swaggerui_blueprint = get_swaggerui_blueprint(

@@ -7,3 +7,4 @@ langchain_text_splitters
 flask-swagger-ui
 flask-cors
 psycopg2-binary
+
