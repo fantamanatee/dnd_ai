@@ -24,6 +24,12 @@ def handle_prompt() -> Response:
 
     prompter_data = data.get('prompter', None)
     responder_data = data.get('responder', None)
+    bot_data = data.get('bot', None)
+
+    if bot_data:
+        bot_id = bot_data.get('_id', None)
+    else:
+        raise ValueError('Bot not found in request data.')
 
     if prompter_data:
         prompter_type = prompter_data.get('type', None)
@@ -40,7 +46,7 @@ def handle_prompt() -> Response:
     # contextualize_q_system_prompt = "Given a chat history and the latest prompt which might reference context in the chat history, formulate a standalone prompt which can be understood without the chat history. Do NOT answer the prompt, just reformulate it if needed and otherwise return it as is."
     # qa_system_prompt = "You are a role playing chatbot for a Dungeons and Dragons game. There are two fictional characters: a prompter and a responder. You must respond to the prompt as if you are the responder. Use the following pieces of retrieved context to answer the prompt. If the context does not apply, respond in a way that makes sense. Use three sentences maximum, and keep the answer concise.\n\n{context}"
     # bot = Chatbot(contextualize_q_system_prompt, qa_system_prompt)
-    bot = Chatbot(ID='66860333855efbe743f85ad1')
+    bot = Chatbot(ID=bot_id)
 
     entity_classes = {
         'Entity': Entity,
@@ -88,10 +94,10 @@ def handle_construct_player() -> Response:
 
 @query_blueprint.route('/all', methods=['GET'])
 def handle_get_all_entity_like() -> Response:
-    
-    entities = DB.Entities.find({'race':{'$exists':'1'}},{'race':1})
-    npcs = DB.NPCs.find({'name':{'$exists':'1'}},{'name':1})
-    players = DB.Players.find({'name':{'$exists':'1'}},{'name':1})
+
+    entities = DB.Entities.find({'race':{'$exists':'1', '$ne': 'null', '$ne': 'None'}},{'race':1})
+    npcs = DB.NPCs.find({'name':{'$exists':'1', '$ne': 'null', '$ne': 'None'}},{'name':1})
+    players = DB.Players.find({'name':{'$exists':'1', '$ne': 'null', '$ne': 'None'}},{'name':1})
 
     entities = [{'_id': str(e.get('_id')), 'name': str(e.get('race')), 'type':'Entity'} for e in entities]
     npcs = [{'_id': str(n.get('_id')), 'name': str(n.get('name')), 'type':'NPC'} for n in npcs]
@@ -105,8 +111,25 @@ def handle_get_all_entity_like() -> Response:
 
     return jsonify(response)
 
+@query_blueprint.route('/bot', methods=['POST'])
+def handle_construct_bot() -> Response:
+    print('Constructing bot...')
+    data = request.json
+    bot = Chatbot(**data)
+    response = f"Bot created: {bot.get_name()}"
+    print(response)
+    return jsonify({'message':response})
 
-    
+@query_blueprint.route('/bot', methods=['GET'])
+def handle_get_all_bots() -> Response:
+    bots = DB.Bots.find({'_id':{'$exists':'1', '$ne': 'null'}, 'name':{'$exists':'1'}})
+    bots = [b for b in bots]
+    for b in bots:
+        b['_id'] = str(b['_id'])
+    response = {
+        'Bots' : bots
+    }
+    return jsonify(response)
 
 
 

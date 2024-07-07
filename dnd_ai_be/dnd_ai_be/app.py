@@ -7,9 +7,11 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = Flask(__name__)
+# CORS(app)
 CORS(app, resources={r"/*": {"origins": [
     "http://127.0.0.1:8080",
     "http://localhost:8080",
+    "http://localhost:5000",
     ]}})  # whitelisted origins
 
 SWAGGER_URL = '/api/docs'
