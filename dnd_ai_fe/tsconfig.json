@@ -5,7 +5,8 @@
         "target": "es6",
         "allowJs": true,
         "strict": true,
-        "moduleResolution": "node"
+        "moduleResolution": "node",
+        "types": ["jest"],
     },
     "include": [
         "src/**/*"
