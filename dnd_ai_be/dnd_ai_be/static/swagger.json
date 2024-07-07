@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "description": "API documentation for the /query endpoint",
+    "description": "API documentation for all endpoints",
     "version": "1.0.0",
     "title": "Query API"
   },
@@ -11,10 +11,10 @@
     "http"
   ],
   "paths": {
-    "/query": {
+    "/prompt": {
       "post": {
-        "summary": "Send a query",
-        "description": "Send a query to the backend and get a response",
+        "summary": "Send a prompt",
+        "description": "Send a prompt to the backend and get a response",
         "consumes": [
           "application/json"
         ],
