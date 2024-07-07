@@ -1,5 +1,5 @@
 import { populateAppendDropdown, convertToDropdownItems } from "./util";
-import { EntityLike, PromptData, DropdownItem } from "./interface";
+import { EntityLike, PromptData, DropdownItem, Bot } from "./interface";
 import { API_ENDPOINTS } from "./config";
 
 // Define your page components testing
@@ -19,6 +19,10 @@ export function renderHome() {
           </p>
   
           <div>
+            <label for="botSelect">Bot:</label>
+            <select id="botSelect" name="bot">
+              <option value="">Select Bot</option>
+            </select>
             <label for="prompterSelect">Prompter:</label>
             <select id="prompterSelect" name="prompter" class="entitylikeDropdown">
               <option value="">Select Prompter</option>
@@ -50,6 +54,7 @@ async function sendPrompt(formData: any): Promise<any> {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
+        bot: formData.bot,
         prompter: formData.prompter,
         responder: formData.responder,
         userInput: formData.userInput,
@@ -65,7 +70,7 @@ async function sendPrompt(formData: any): Promise<any> {
 
 export async function handleSendPrompt(): Promise<void> {
   try {
-    const formData = getPromptData(); 
+    const formData = getPromptData();
     const responseMessage = await sendPrompt(formData);
     updateDialogueDisplay(
       formData.prompter,
@@ -101,14 +106,14 @@ async function fetchEntityLikeData(): Promise<{
 }> {
   try {
     const data = await sendGetAllEntityLike();
-
     // Validate and ensure each item in arrays is of type EntityLike
-    const entities: EntityLike[] = Array.isArray(data.Entities) ? data.Entities : [];
+    const entities: EntityLike[] = Array.isArray(data.Entities)
+      ? data.Entities
+      : [];
     const npcs: EntityLike[] = Array.isArray(data.NPCs) ? data.NPCs : [];
-    const players: EntityLike[] = Array.isArray(data.Players) ? data.Players : [];
-    // const entities = data.Entities || [];
-    // const npcs = data.NPCs || [];
-    // const players = data.Players || [];
+    const players: EntityLike[] = Array.isArray(data.Players)
+      ? data.Players
+      : [];
 
     return { entities, npcs, players };
   } catch (error) {
@@ -118,13 +123,13 @@ async function fetchEntityLikeData(): Promise<{
 }
 
 async function loadEntityLikeDropdown() {
-  console.log('loadEntityLikeDropdown called')
+  console.log("loadEntityLikeDropdown called");
   const { entities, npcs, players } = await fetchEntityLikeData();
 
-  console.log('entities:', entities)
-  console.log('npcs:', npcs)
-  console.log('players:', players)
-  
+  console.log("entities:", entities);
+  console.log("npcs:", npcs);
+  console.log("players:", players);
+
   const dropdowns = document.querySelectorAll(
     ".entitylikeDropdown"
   ) as NodeListOf<HTMLSelectElement>;
@@ -137,24 +142,65 @@ async function loadEntityLikeDropdown() {
   });
 }
 
+export async function sendGetAllBots(): Promise<any> {
+  const url = API_ENDPOINTS.BOT;
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  return await response.json();
+}
+
+async function loadBotSelect() {
+  const botSelect = document.getElementById("botSelect") as HTMLSelectElement;
+  if (botSelect) {
+    botSelect.innerHTML = "";
+    const data = await sendGetAllBots();
+    const bots: Bot[] = Array.isArray(data.Bots) ? data.Bots : [];
+    const botSelectItems: DropdownItem[] = bots.map((bot) => ({
+      value: bot._id!,
+      text: bot.name,
+    }));
+
+    console.log("botSelectItems:", botSelectItems);
+    populateAppendDropdown(botSelect, botSelectItems);
+  } else {
+    console.error("Dropdown with ID botSelect not found.");
+  }
+}
+
 function getPromptData(): PromptData {
   const userInput = (<HTMLInputElement>document.getElementById("userInput"))
     .value;
+  const botSelect = document.getElementById("botSelect") as HTMLSelectElement;
   const prompterSelect = document.getElementById(
     "prompterSelect"
   ) as HTMLSelectElement;
   const responderSelect = document.getElementById(
     "responderSelect"
   ) as HTMLSelectElement;
+  
+  const selectedBot = botSelect.selectedOptions[0];
+  const BOT_ID = selectedBot.value;
+  const botName = selectedBot.text;
+  const botType = 'default_bot'
 
-  const selectedOption1 = prompterSelect.selectedOptions[0];
-  const selectedOption2 = responderSelect.selectedOptions[0];
-  const PROMPTER_ID = selectedOption1.value;
-  const RESPONDER_ID = selectedOption2.value;
-  const prompterType = selectedOption1.text.split(":")[0];
-  const responderType = selectedOption2.text.split(":")[0];
-  const prompterName = selectedOption1.text.split(":")[1];
-  const responderName = selectedOption2.text.split(":")[1];
+  const selectedPrompter = prompterSelect.selectedOptions[0];
+  const selectedResponder = responderSelect.selectedOptions[0];
+  const PROMPTER_ID = selectedPrompter.value;
+  const RESPONDER_ID = selectedResponder.value;
+
+  const prompterType = selectedPrompter.text.split(":")[0];
+  const responderType = selectedResponder.text.split(":")[0];
+  const prompterName = selectedPrompter.text.split(":")[1];
+  const responderName = selectedResponder.text.split(":")[1];
 
   return {
     userInput,
@@ -167,6 +213,11 @@ function getPromptData(): PromptData {
       _id: RESPONDER_ID,
       name: responderName,
       type: responderType,
+    },
+    bot: {
+      _id: BOT_ID,
+      name: botName,
+      type: botType,
     },
   };
 }
@@ -207,9 +258,7 @@ class DialogueHandler {
   private dialogue: { prompt: string; response: string }[];
 
   constructor() {
-    // Initialize dialogue from localStorage or set to an empty array if not found
-    const storedDialogue = localStorage.getItem("dialogue");
-    this.dialogue = storedDialogue ? JSON.parse(storedDialogue) : [];
+    this.dialogue = [];
   }
 
   public getDialogue(): { prompt: string; response: string }[] {
@@ -217,32 +266,18 @@ class DialogueHandler {
   }
 
   public addToDialogue(prompt: string, response: string): void {
-    // Add new prompt and response to dialogue
     this.dialogue.push({ prompt, response });
 
-    // Limit dialogue to last 5 items
     if (this.dialogue.length > 5) {
       this.dialogue = this.dialogue.slice(-5);
     }
-
-    // Save updated dialogue to localStorage
-    this.saveDialogueToLocalStorage();
-  }
-
-  private saveDialogueToLocalStorage(): void {
-    localStorage.setItem("dialogue", JSON.stringify(this.dialogue));
   }
 
   public clearDialogue(): void {
-    // Clear dialogue and remove from localStorage
     this.dialogue = [];
-    localStorage.removeItem("dialogue");
   }
 }
 const dialogueHandler = new DialogueHandler();
-window.addEventListener("beforeunload", () => {
-  dialogueHandler.clearDialogue();
-});
 
 function setupHome() {
   console.log("setupHome called");
@@ -253,7 +288,12 @@ function setupHome() {
   } else {
     console.error('Button with ID "sendPromptButton" not found.');
   }
-
+  const botSelect = document.getElementById("botSelect");
+  if (botSelect) {
+    loadBotSelect();
+  } else {
+    console.error('Dropdown with ID "botSelect" not found.');
+  }
   const prompterSelect = document.getElementById("prompterSelect");
   const responderSelect = document.getElementById("responderSelect");
   if (prompterSelect && responderSelect) {
