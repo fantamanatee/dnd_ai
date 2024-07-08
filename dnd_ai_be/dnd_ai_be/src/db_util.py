@@ -9,7 +9,7 @@ URI = f"mongodb+srv://{os.getenv('DND_AI_DB_USER')}:{os.getenv('DND_AI_DB_PWD')}
 URI_with_options = f"{URI}&ssl=true&connectTimeoutMS=10000&socketTimeoutMS=10000"
 
 # CLIENT = MongoClient(URI)
-CLIENT = MongoClient(URI_with_options, ssl_cert_reqs=ssl.CERT_NONE)
+CLIENT = MongoClient(URI_with_options, tlsAllowInvalidCertificates=True)
 
 DB_NAME = 'test_db'
 DB = CLIENT[DB_NAME]
