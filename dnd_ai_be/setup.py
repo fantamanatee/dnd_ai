@@ -5,9 +5,9 @@ setup(
     version='0.1',
     packages=find_packages(include=['dnd_ai_be', 'dnd_ai_be.*']),
     install_requires=[
-        'pip>=22.0.0',
         'Flask',
         'langchain',
+        'pysqlite3-binary',
         'langchain_chroma',
         'langchain_community',
         'langchain_openai',
