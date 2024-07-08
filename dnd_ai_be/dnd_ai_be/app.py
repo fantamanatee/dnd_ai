@@ -6,9 +6,8 @@ sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 from flask_cors import CORS
 from flask import Flask
 from dnd_ai_be.src.api_util import query_blueprint
-from dotenv import load_dotenv
+import os 
 
-load_dotenv()
 
 
 app = Flask(__name__)
@@ -35,4 +34,10 @@ app.register_blueprint(query_blueprint)
 # app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 10000))
+
+    app.run(debug=True,
+            host='0.0.0.0',
+            port=port,
+            )
+    # app.run(debug=True,)
