@@ -1,15 +1,14 @@
-# from flask_swagger_ui import get_swaggerui_blueprint
+# these three lines swap the stdlib sqlite3 lib with the pysqlite3 package
+__import__('pysqlite3')
+import sys
+sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+
 from flask_cors import CORS
 from flask import Flask
 from dnd_ai_be.src.api_util import query_blueprint
 from dotenv import load_dotenv
 
 load_dotenv()
-
-# these three lines swap the stdlib sqlite3 lib with the pysqlite3 package
-__import__('pysqlite3')
-import sys
-sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
 
 app = Flask(__name__)
