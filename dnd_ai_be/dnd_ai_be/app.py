@@ -6,6 +6,12 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# these three lines swap the stdlib sqlite3 lib with the pysqlite3 package
+__import__('pysqlite3')
+import sys
+sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+
+
 app = Flask(__name__)
 # CORS(app, resources={r"/*": {"origins": [
 #     "http://127.0.0.1:8080",
