@@ -2,6 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='dnd_ai_be',
+    python='3.10',
     version='0.1',
     packages=find_packages(include=['dnd_ai_be', 'dnd_ai_be.*']),
     install_requires=[
