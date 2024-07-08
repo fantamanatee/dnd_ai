@@ -4,7 +4,6 @@ setup(
     name='dnd_ai_be',
     version='0.1',
     packages=find_packages(include=['dnd_ai_be', 'dnd_ai_be.*']),
-    python='3.10',
     install_requires=[
         'Flask',
         'langchain>=0.0.354',
