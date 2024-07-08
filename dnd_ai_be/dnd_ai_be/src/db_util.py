@@ -7,7 +7,10 @@ from dnd_ai_be.src.characters import Entity, NPC, Player
 from typing import Union, List
 import os
 
-URI = f"mongodb+srv://{os.getenv('DND_AI_DB_USER')}:{os.getenv('DND_AI_DB_PWD')}@cluster91339.czkmuen.mongodb.net/?appName=Cluster91339"
+# URI = f"mongodb+srv://{os.getenv('DND_AI_DB_USER')}:{os.getenv('DND_AI_DB_PWD')}@cluster91339.czkmuen.mongodb.net/?appName=Cluster91339"
+URI = f"mongodb+srv://{os.getenv('DND_AI_DB_USER')}:{os.getenv('DND_AI_DB_PWD')}@cluster91339.czkmuen.mongodb.net/test_db?retryWrites=true&w=majority"
+
+
 URI_with_options = f"{URI}&ssl=true&connectTimeoutMS=30000&socketTimeoutMS=30000"
 
 # CLIENT = MongoClient(URI)
