@@ -1,11 +1,13 @@
 const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   mode: 'development',  // Set to 'production' for minified output
-  entry: './src/scripts/main.ts',  // Entry point of your TypeScript application
+  entry: './scripts/main.ts',  // Entry point of your TypeScript application
   output: {
     filename: 'bundle.js',  // Output bundle file name
-    path: path.resolve(__dirname, 'src/dist'),  // Output directory
+    path: path.resolve(__dirname, './dist'),  // Output directory
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.js'],  // Resolve TypeScript and JavaScript files
@@ -23,4 +25,53 @@ module.exports = {
       },
     ],
   },
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: 'public/index.html',
+      filename: 'index.html',
+    }),
+    new CopyPlugin({
+      patterns: [
+        { from: 'public/styles', to: 'styles' },
+      ],
+    }),
+  ],
 };
+
+// const path = require('path');
+// const HtmlWebpackPlugin = require('html-webpack-plugin');
+// const CopyPlugin = require('copy-webpack-plugin');
+
+// module.exports = {
+//   entry: './src/index.ts',
+//   output: {
+//     filename: 'bundle.js',
+//     path: path.resolve(__dirname, 'dist'),
+//   },
+//   module: {
+//     rules: [
+//       {
+//         test: /\.tsx?$/,
+//         use: 'ts-loader',
+//         exclude: /node_modules/,
+//       },
+//       {
+//         test: /\.css$/,
+//         use: ['style-loader', 'css-loader'],
+//       },
+//     ],
+//   },
+//   plugins: [
+//     new HtmlWebpackPlugin({
+//       template: 'public/index.html',
+//     }),
+//     new CopyPlugin({
+//       patterns: [
+//         { from: 'public', to: 'dist' },
+//       ],
+//     }),
+//   ],
+//   resolve: {
+//     extensions: ['.tsx', '.ts', '.js'],
+//   },
+// };

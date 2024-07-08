@@ -5,7 +5,6 @@ dnd_ai_be/dnd_ai_be/test
 # USER DEFINED -- FRONTEND
 dnd_ai_fe/package-lock.json
 dnd_ai_fe/node_modules
-dnd_ai_fe/dist
 
 dnd_ai_fe/src/sum.test.ts
 dnd_ai_fe/src/sum.ts
