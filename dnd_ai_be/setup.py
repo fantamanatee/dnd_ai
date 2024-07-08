@@ -2,15 +2,13 @@ from setuptools import setup, find_packages
 
 setup(
     name='dnd_ai_be',
-    python='3.10',
     version='0.1',
     packages=find_packages(include=['dnd_ai_be', 'dnd_ai_be.*']),
     install_requires=[
         'Flask',
-        'langchain>=0.0.354',
-        'langchain_community',
-        'sqlite3 >= 3.35.0',
+        'langchain',
         'langchain_chroma',
+        'langchain_community',
         'langchain_openai',
         'langchain_text_splitters',
         'langchain_mongodb',
@@ -18,7 +16,6 @@ setup(
         'flask-cors',
         'motor',
         'beautifulsoup4',
-        
     ],
 )
 
