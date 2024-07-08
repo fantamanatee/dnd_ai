@@ -9,6 +9,7 @@ setup(
         'Flask',
         'langchain>=0.0.354',
         'langchain_community',
+        'sqlite3 >= 3.35.0',
         'langchain_chroma',
         'langchain_openai',
         'langchain_text_splitters',
@@ -17,6 +18,7 @@ setup(
         'flask-cors',
         'motor',
         'beautifulsoup4',
+        
     ],
 )
 
