@@ -1,5 +1,6 @@
 // config.ts
-const BASE_URL = "http://localhost:5000";
+// const BASE_URL = "http://localhost:5000";
+const BASE_URL = "https://dnd-ai-server.onrender.com"
 
 export const API_ENDPOINTS = {
   PROMPT: `${BASE_URL}/prompt`,
