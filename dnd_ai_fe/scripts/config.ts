@@ -1,14 +1,14 @@
 
 let environment;
-
+console.log('process.env.NODE_ENV:',process.env.NODE_ENV);
 if (process.env.NODE_ENV === 'development') {
   environment = {
-    ENVIRONMENT: 'DEV',
+    ENVIRONMENT: 'development',
     BASE_URL: 'http://localhost:5000'
   };
 } else {
   environment = {
-    ENVIRONMENT: 'PROD',
+    ENVIRONMENT: 'production',
     BASE_URL: 'https://dnd-ai-server.onrender.com'
   };
 }
