@@ -1,13 +1,14 @@
 # these three lines swap the stdlib sqlite3 lib with the pysqlite3 package
-__import__('pysqlite3')
+
 import sys
-sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+if 'pysqlite3' in sys.modules:
+    __import__('pysqlite3')
+    sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
 from flask_cors import CORS
 from flask import Flask
 from dnd_ai_be.src.api_util import query_blueprint
 import os 
-
 
 
 app = Flask(__name__)
@@ -36,8 +37,10 @@ app.register_blueprint(query_blueprint)
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 10000))
 
-    app.run(debug=True,
-            host='0.0.0.0',
-            port=port,
-            )
-    # app.run(debug=True,)
+    if os.getenv('ENVIRONMENT', 'production') == 'development':
+        app.run(debug=True,)
+    else:
+        app.run(debug=True,
+                host='0.0.0.0',
+                port=port,
+                )
