@@ -263,11 +263,14 @@
   },
   "devDependencies": {
     "@types/jest": "^29.5.12",
-    "@types/node": "^20.14.10"
+    "@types/node": "^20.14.10",
+    "cross-env": "^7.0.3",
+    "webpack-dev-server": "^5.0.4"
   },
   "scripts": {
     "test": "jest",
-    "build": "webpack --config webpack.config.js"
+    "build": "cross-env ENVIRONMENT=production webpack --config webpack.config.js",
+    "start": "cross-env ENVIRONMENT=development webpack serve --config webpack.config.js"
   },
   "repository": {
     "type": "git",
