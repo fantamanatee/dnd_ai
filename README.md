@@ -1,36 +1,12 @@
 # DnD_AI
 
-Foobar is a Python library for dealing with word pluralization.
+Powered by LLMs and LangChain, DnD_AI is a WebApp for Dungeons and Dragons players to create and chat with AI characters.
 
-## Installation
+## Architecture
 
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install foobar.
+The back end uses LangChain and the OpenAI API for chatbot functionality. All character, session, and bot data are stored in MongoDB.
 
-```bash
-pip install foobar
-```
-
-## Usage
-
-```python
-import foobar
-
-# returns 'words'
-foobar.pluralize('word')
-
-# returns 'geese'
-foobar.pluralize('goose')
-
-# returns 'phenomenon'
-foobar.singularize('phenomena')
-```
-
-## Contributing
-
-Pull requests are welcome. For major changes, please open an issue first
-to discuss what you would like to change.
-
-Please make sure to update tests as appropriate.
+The front end is built from scratch using TypeScript, HTML, and CSS.
 
 ## License
 
