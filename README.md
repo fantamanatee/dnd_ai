@@ -1,7 +1,3 @@
-Sure, here's a spiced-up version of your README with added formatting and emojis:
-
----
-
 # DnD_AI 🐉✨
 
 Welcome to DnD_AI, the ultimate WebApp for Dungeons and Dragons enthusiasts to create and interact with AI characters!
