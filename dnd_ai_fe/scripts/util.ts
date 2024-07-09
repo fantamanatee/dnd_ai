@@ -4,8 +4,6 @@ export function populateAppendDropdown(
   dropdown: HTMLSelectElement,
   items: DropdownItem[],
 ) {
-  console.log("populateAppendDropdown called");
-  console.log("items:", items);
   items.forEach((item: DropdownItem) => {
     const option = document.createElement("option");
     option.value = item.value;

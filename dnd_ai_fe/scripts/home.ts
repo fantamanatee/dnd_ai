@@ -45,7 +45,6 @@ export function renderHome() {
 }
 
 async function sendPrompt(formData: any): Promise<any> {
-  console.log("Sending prompt...");
   try {
     const url = API_ENDPOINTS.PROMPT;
     const response = await fetch(url, {
@@ -123,12 +122,8 @@ async function fetchEntityLikeData(): Promise<{
 }
 
 async function loadEntityLikeDropdown() {
-  console.log("loadEntityLikeDropdown called");
   const { entities, npcs, players } = await fetchEntityLikeData();
 
-  console.log("entities:", entities);
-  console.log("npcs:", npcs);
-  console.log("players:", players);
 
   const dropdowns = document.querySelectorAll(
     ".entitylikeDropdown"
@@ -169,7 +164,6 @@ async function loadBotSelect() {
       text: bot.name,
     }));
 
-    console.log("botSelectItems:", botSelectItems);
     populateAppendDropdown(botSelect, botSelectItems);
   } else {
     console.error("Dropdown with ID botSelect not found.");
@@ -280,9 +274,7 @@ class DialogueHandler {
 const dialogueHandler = new DialogueHandler();
 
 function setupHome() {
-  console.log("setupHome called");
   const sendPromptButton = document.getElementById("sendPromptButton");
-  console.log();
   if (sendPromptButton) {
     sendPromptButton.addEventListener("click", handleSendPrompt);
   } else {

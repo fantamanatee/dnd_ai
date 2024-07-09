@@ -1,6 +1,20 @@
-// config.ts
-// const BASE_URL = "http://localhost:5000";
-const BASE_URL = "https://dnd-ai-server.onrender.com"
+
+let environment;
+
+if (process.env.NODE_ENV === 'development') {
+  environment = {
+    ENVIRONMENT: 'DEV',
+    BASE_URL: 'http://localhost:5000'
+  };
+} else {
+  environment = {
+    ENVIRONMENT: 'PROD',
+    BASE_URL: 'https://dnd-ai-server.onrender.com'
+  };
+}
+const BASE_URL = environment.BASE_URL;
+console.log(`Using BASE_URL: ${BASE_URL}`);
+
 
 export const API_ENDPOINTS = {
   PROMPT: `${BASE_URL}/prompt`,

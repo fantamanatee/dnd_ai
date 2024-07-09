@@ -76,7 +76,6 @@ async function loadEntityLikeTypeSelect() {
       value: option.toLowerCase(),
       text: option,
     }));
-    console.log("dropdownItems:", dropdownItems);
     populateAppendDropdown(entityTypeDropdown, dropdownItems);
   } else {
     console.error("Dropdown with ID entityLikeTypeDropdown not found.");
@@ -139,15 +138,12 @@ export async function handleSendCreateCharacter(): Promise<void> {
   let response;
   try {
     if (selectedType === "entity") {
-      console.log("Creating Entity...");
       const entity = validateEntity(JSON.parse(userInput.value));
       response = await sendConstructEntity(entity);
     } else if (selectedType === "npc") {
-      console.log("Creating NPC...");
       const npc = validateNPC(JSON.parse(userInput.value));
       response = await sendConstructNPC(npc);
     } else if (selectedType === "player") {
-      console.log("Creating Player...");
       const plaver = validatePlayer(JSON.parse(userInput.value));
       response = await sendConstructPlayer(plaver);
     } else {
@@ -163,7 +159,6 @@ export async function handleSendCreateCharacter(): Promise<void> {
 }
 
 function setupCharacterBuilder() {
-  console.log("setupCharacterBuilder called");
 
   const entityLikeTypeSelect = document.getElementById("entityLikeTypeSelect") as HTMLSelectElement;
   const userInput = document.getElementById("userInput") as HTMLTextAreaElement;

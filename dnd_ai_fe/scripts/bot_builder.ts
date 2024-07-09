@@ -105,8 +105,6 @@ export async function handleSendCreateBot(): Promise<void> {
   let response;
   try {
     if (selectedType === "default_bot") {
-      console.log("Creating bot...");
-      console.log("userInput.value:", userInput.value)
       const bot : Bot = validateBot(JSON.parse(userInput.value));
       response = await sendConstructBot(bot);
     } else {
@@ -126,7 +124,6 @@ function setupBotBuilder() {
   const userInput = document.getElementById("userInput") as HTMLTextAreaElement;
   
   botSelect.addEventListener("change", function() {
-    console.log('changed!')
     switch (botSelect.value) {
         case "default_bot":
             userInput.value = JSON.stringify(exampleBot, null, 2);
