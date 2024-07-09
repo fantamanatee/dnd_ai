@@ -14,6 +14,9 @@ from dnd_ai_be.src.db_util import DB, URI, DB_NAME
 from dnd_ai_be.src.characters import Entity
 from dnd_ai_be.src.util import timer
 
+import logging
+logging.basicConfig(level=logging.DEBUG)
+
 class Chatbot:
     '''
     Chatbot class that wraps the OpenAI API and provides a simple interface for interacting with it.
@@ -70,6 +73,8 @@ class Chatbot:
             MessagesPlaceholder("history"),
             ("human", "{input}"),
         ])
+        print(self.contextualize_q_prompt)
+        print(self.qa_prompt)
 
         self.llm = ChatOpenAI(model=self.config['model'], temperature=self.config['temperature'])
         self.question_answer_chain = create_stuff_documents_chain(self.llm, self.qa_prompt)
@@ -107,7 +112,7 @@ class Chatbot:
             rag_chain = create_retrieval_chain(self.history_aware_retriever, self.question_answer_chain)
             conversational_rag_chain = RunnableWithMessageHistory(
                 rag_chain,
-                lambda session_id: MongoDBChatMessageHistory(
+                lambda : MongoDBChatMessageHistory(
                     session_id=session_id,
                     connection_string=URI,
                     database_name=DB_NAME,
@@ -134,6 +139,8 @@ class Chatbot:
         
         res = do_invoke()
         answer = res["answer"]
+
+        print()
         return answer
 
     def to_dict(self):
