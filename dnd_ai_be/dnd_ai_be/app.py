@@ -1,6 +1,6 @@
 # these three lines swap the stdlib sqlite3 lib with the pysqlite3 package
-
 import sys
+import os
 if os.getenv('ENVIRONMENT', 'production') == 'production':
     __import__('pysqlite3')
     sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
@@ -8,7 +8,6 @@ if os.getenv('ENVIRONMENT', 'production') == 'production':
 from flask_cors import CORS
 from flask import Flask
 from dnd_ai_be.src.api_util import query_blueprint
-import os 
 
 
 app = Flask(__name__)
