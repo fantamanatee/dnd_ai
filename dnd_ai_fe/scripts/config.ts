@@ -1,7 +1,7 @@
 
 let environment;
-console.log('process.env.NODE_ENV:',process.env.NODE_ENV);
-if (process.env.NODE_ENV === 'development') {
+console.log('process.env.ENVIRONMENT:',process.env.ENVIRONMENT);
+if (process.env.ENVIRONMENT === 'development') {
   environment = {
     ENVIRONMENT: 'development',
     BASE_URL: 'http://localhost:5000'
