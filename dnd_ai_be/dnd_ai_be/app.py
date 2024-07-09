@@ -1,7 +1,7 @@
 # these three lines swap the stdlib sqlite3 lib with the pysqlite3 package
 
 import sys
-if 'pysqlite3' in sys.modules:
+if os.getenv('ENVIRONMENT', 'production') == 'production':
     __import__('pysqlite3')
     sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
