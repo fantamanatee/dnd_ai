@@ -6,7 +6,7 @@
         "allowJs": true,
         "strict": true,
         "moduleResolution": "node",
-        "types": ["jest"],
+        "types": ["jest", "node"],
     },
     "include": [
         "scripts/**/*"
