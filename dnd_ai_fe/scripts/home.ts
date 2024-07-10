@@ -16,6 +16,7 @@ export function renderHome() {
               Powered by LLMs and LangChain. <br>
               Designed for DnD Players and Dungeon Masters. <br>
               Dnd AI provides a toolkit for complex NPC interactions, character building, and more.
+              <b>Due to our current hosting limitations, Please allow 50 seconds for website to spin up! Thank you for your patience.</b>
           </p>
   
           <div>
