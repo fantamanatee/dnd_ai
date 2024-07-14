@@ -178,3 +178,60 @@ body.dark-mode {
     --response-background: #3a354b;
     --response-text: #c5c3da;
   }
+
+  .tooltip {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 5px;
+    padding: 5px 0;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%; /* Position above */
+    left: 50%;
+    margin-left: -60px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  
+  .tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+  }
+  
+  .collapsible {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+  }
+  
+  .collapsible.open {
+    max-height: 1000px; /* Adjust as needed, this value should be more than enough */
+  }
+  
+  .toggle-label {
+    display: block;
+    background-color: #f0f0f0;
+    padding: 0.5rem;
+    cursor: pointer;
+  }
+  
+  /* .content {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.3s ease-out;
+  }
+  
+  .content label,
+  .content select {
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+   */

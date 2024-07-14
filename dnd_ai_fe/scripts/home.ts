@@ -20,18 +20,24 @@ export function renderHome() {
           </p>
   
           <div>
-            <label for="botSelect">Bot:</label>
-            <select id="botSelect" name="bot">
-              <option value="">Select Bot</option>
-            </select>
-            <label for="prompterSelect">Prompter:</label>
-            <select id="prompterSelect" name="prompter" class="entitylikeDropdown">
-              <option value="">Select Prompter</option>
-            </select>
-            <label for="responderSelect">Responder:</label>
-            <select id="responderSelect" name="responder" class="entitylikeDropdown">
-              <option value="">Select Responder</option>
-            </select>
+
+            <div id="options" class="collapsible open">
+              <label for="botSelect">Bot:</label>
+              <select id="botSelect" name="bot">
+                <option value="">Select Bot</option>
+              </select>
+              <label for="prompterSelect">Prompter:</label>
+              <span class="tooltiptext" id="tooltipText"></span>
+              <select id="prompterSelect" name="prompter" class="entitylikeDropdown">
+                <option value="">Select Prompter</option>
+              </select>
+              <label for="responderSelect">Responder:</label>
+              <select id="responderSelect" name="responder" class="entitylikeDropdown">
+                <option value="">Select Responder</option>
+              </select>
+            </div>
+            <label for="collapsible-toggle" class="collapsible-toggle">Collapse Options</label>
+            <input type="checkbox" id="collapsible-toggle" class="toggle">
   
             <label for="userInput">Enter Text:</label>
             <input type="text" id="userInput" name="userInput">
@@ -83,6 +89,39 @@ export async function handleSendPrompt(): Promise<void> {
   }
 }
 
+export async function handleGetEntityLike(entity_like: EntityLike): Promise<void> {
+  let data;
+  const type = entity_like.type;
+  
+  if (type === 'entity') {
+    data = await sendGetEntity();  }
+  else if (type === 'npc') {
+    data = null;  }
+  else if (type === 'player') {
+    data = null;  }
+  else {
+    console.error('Invalid type:', type);
+  }
+
+  console.log('data:', data);
+}
+
+export async function sendGetEntity(): Promise<any> {
+  const url = API_ENDPOINTS.ENTITY;
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  return await response.json();
+}
+
 export async function sendGetAllEntityLike(): Promise<any> {
   const url = API_ENDPOINTS.ALL;
   const response = await fetch(url, {
@@ -124,7 +163,6 @@ async function fetchEntityLikeData(): Promise<{
 
 async function loadEntityLikeDropdown() {
   const { entities, npcs, players } = await fetchEntityLikeData();
-
 
   const dropdowns = document.querySelectorAll(
     ".entitylikeDropdown"
@@ -181,11 +219,11 @@ function getPromptData(): PromptData {
   const responderSelect = document.getElementById(
     "responderSelect"
   ) as HTMLSelectElement;
-  
+
   const selectedBot = botSelect.selectedOptions[0];
   const BOT_ID = selectedBot.value;
   const botName = selectedBot.text;
-  const botType = 'default_bot'
+  const botType = "default_bot";
 
   const selectedPrompter = prompterSelect.selectedOptions[0];
   const selectedResponder = responderSelect.selectedOptions[0];
@@ -249,6 +287,60 @@ function updateDialogueDisplay(
   responseDiv!.style.maxHeight = "300px"; // Set the desired max height for scrolling
 }
 
+function updateEntityLikeDisplay() {
+
+}
+
+// function setupTooltip() {
+//   console.log('setting up tooltip')
+//   const prompterSelect = document.getElementById(
+//     "prompterSelect"
+//   ) as HTMLSelectElement;
+//   const tooltipText = document.getElementById("tooltipText") as HTMLSpanElement;
+
+//   if (prompterSelect.selectedIndex !== -1) {
+//     const selectedOption = prompterSelect.selectedOptions[0];
+//   }
+
+//   prompterSelect.addEventListener("mouseover", (event) => {
+//     const selectedOption = prompterSelect.selectedOptions[0];
+//     if (selectedOption && event.target === prompterSelect) {
+//       tooltipText.textContent = `EXAMPLE: ${selectedOption.text}`;
+//       tooltipText.style.visibility = "visible";
+//       tooltipText.style.opacity = "1";
+//     }
+//   });
+
+//   prompterSelect.addEventListener("mouseout", () => {
+//     tooltipText.style.visibility = "hidden";
+//     tooltipText.style.opacity = "0";
+//   });
+// }
+
+function setupCollapsible() {
+  console.log('setupCollapsible called!')
+  const toggle = document.getElementById('collapsible-toggle') as HTMLInputElement;
+  const collapsible = document.getElementById('options') as HTMLElement;
+
+  if (toggle === null) {console.error('Collapsible toggle not found.');}
+  if (collapsible === null) {console.error('Collapsible elements not found.');}
+
+  toggle.addEventListener('change', function() {
+    console.log(collapsible.classList);
+    if (toggle.checked) {
+      if (collapsible.classList.contains('open')) {
+        collapsible.classList.remove('open');
+      }
+    } else {
+      if (!collapsible.classList.contains('open')) {
+        collapsible.classList.add('open');
+      }
+    }
+    console.log(collapsible.classList);
+  });
+}
+
+
 class DialogueHandler {
   private dialogue: { prompt: string; response: string }[];
 
@@ -272,6 +364,7 @@ class DialogueHandler {
     this.dialogue = [];
   }
 }
+
 const dialogueHandler = new DialogueHandler();
 
 function setupHome() {
@@ -296,4 +389,5 @@ function setupHome() {
       'Dropdowns with IDs "prompterSelect" and "responderSelect" not found.'
     );
   }
+  setupCollapsible();
 }
