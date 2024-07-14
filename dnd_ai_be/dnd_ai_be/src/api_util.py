@@ -1,5 +1,5 @@
 from flask import request, jsonify, Blueprint, Response
-from dnd_ai_be.src.characters import NPC, Player, Entity
+from dnd_ai_be.src.characters import NPC, Player, Entity, entity_like_classes
 from dnd_ai_be.src.db_util import DB
 from dnd_ai_be.src.chatbot import Chatbot
 from time import time
@@ -43,25 +43,16 @@ def handle_prompt() -> Response:
     else: 
         raise ValueError('Responder not found in request data.')
     
-    # contextualize_q_system_prompt = "Given a chat history and the latest prompt which might reference context in the chat history, formulate a standalone prompt which can be understood without the chat history. Do NOT answer the prompt, just reformulate it if needed and otherwise return it as is."
-    # qa_system_prompt = "You are a role playing chatbot for a Dungeons and Dragons game. There are two fictional characters: a prompter and a responder. You must respond to the prompt as if you are the responder. Use the following pieces of retrieved context to answer the prompt. If the context does not apply, respond in a way that makes sense. Use three sentences maximum, and keep the answer concise.\n\n{context}"
-    # bot = Chatbot(contextualize_q_system_prompt, qa_system_prompt)
     bot = Chatbot(ID=bot_id)
-
-    entity_classes = {
-        'Entity': Entity,
-        'NPC': NPC,
-        'Player': Player
-    }
     
     prompter, responder = None, None
-    if prompter_type in entity_classes:
-        prompter = entity_classes[prompter_type](ID=prompter_id)
+    if prompter_type in entity_like_classes:
+        prompter = entity_like_classes[prompter_type](ID=prompter_id)
     else:
         raise ValueError(f'Prompter type {prompter_type} not found in request data.')
   
-    if responder_type in entity_classes:
-        responder = entity_classes[responder_type](ID=responder_id)
+    if responder_type in entity_like_classes:
+        responder = entity_like_classes[responder_type](ID=responder_id)
     else:
         raise ValueError(f'Responder type {responder_type} not found in request data.')    
 
@@ -109,6 +100,13 @@ def handle_get_all_entity_like() -> Response:
         'Players': players
     }
 
+    return jsonify(response)
+
+@query_blueprint.route('/entity', methods=['GET'])
+def handle_get_entity() -> Response:
+    data = request.json
+    entity = Entity(**data)
+    response = entity.get_data()
     return jsonify(response)
 
 @query_blueprint.route('/bot', methods=['POST'])
