@@ -1,6 +1,11 @@
-import { populateAppendDropdown, convertToDropdownItems, DialogueHandler } from "./util";
+import {
+  populateAppendDropdown,
+  convertToDropdownItems,
+  DialogueHandler,
+} from "./util";
 import { EntityLike, PromptData, DropdownItem, Bot } from "./interface";
 import { API_ENDPOINTS } from "./config";
+import { send } from "process";
 
 const dialogueHandler = new DialogueHandler();
 
@@ -26,52 +31,53 @@ export function renderHome() {
             <b>Due to our current hosting limitations, Please allow 50 seconds for the website to spin up! Thank you for your patience.</b>
         </p>
       </section>
-        <div id="options" class="collapsible open">
-          <section id="options-section>
-              <label for="botSelect">Bot:</label>
-              <select id="botSelect" name="bot">
-                <option value="">Select Bot</option>
-              </select>
-              <label for="prompterSelect">Prompter:</label>
-              <select id="prompterSelect" name="prompter" class="entitylikeDropdown">
-                <option value="">Select Prompter</option>
-              </select>
-              <label for="responderSelect">Responder:</label>
-              <select id="responderSelect" name="responder" class="entitylikeDropdown">
-                <option value="">Select Responder</option>
-              </select>
-          </section>
-        </div>
 
-        <div class="toggle-container">
-          <label for="collapsible-toggle1">Collapse Options</label>
-          <input type="checkbox" id="collapsible-toggle1" class="toggle">
-        </div>
+      <div id="options" class="collapsible open">
+        <section id="options-section">
+            <label for="prompterSelect">Prompter:</label>
+            <select id="prompterSelect" name="prompter" class="entitylikeDropdown">
+              <option value="">Select Prompter</option>
+            </select>
+            <label for="responderSelect">Responder:</label>
+            <select id="responderSelect" name="responder" class="entitylikeDropdown">
+              <option value="">Select Responder</option>
+            </select>
+            <label for="botSelect">Bot:</label>
+            <select id="botSelect" name="bot">
+              <option value="">Select Bot</option>
+            </select>
+        </section>
+      </div>
 
-          <div id="Character Info" class="collapsible open">
-            <section id="jsonDisplay">
-              <label for="jsonContent">Character Info:</label>
-              <pre id="jsonContent"></pre>
-            </section>
-          </div>
-          
-          <div class="toggle-container">
-            <label for="collapsible-toggle2" class="collapsible-toggle">Collapse Character Info</label>
-            <input type="checkbox" id="collapsible-toggle2" class="toggle">
-          </div>
+      <div class="toggle-container indent-section">
+        <label for="collapsible-toggle1">Collapse Options</label>
+        <input type="checkbox" id="collapsible-toggle1" class="toggle">
+      </div>
 
+      <div id="Character Info" class="collapsible open">
+        <section id="jsonDisplay">
+          <label for="prompterInfo">Prompter Info:</label>
+          <pre id="prompterInfo"></pre>
+          <label for="responderInfo">Responder Info:</label>
+          <pre id="responderInfo"></pre>
+        </section>
+      </div>
+      
+      <div class="toggle-container indent-section">
+        <label for="collapsible-toggle2" class="collapsible-toggle">Collapse Character Info</label>
+        <input type="checkbox" id="collapsible-toggle2" class="toggle">
+      </div>
+
+      <section id="dialogue">
         <div>
           <label for="userInput">Enter Text:</label>
           <input type="text" id="userInput" name="userInput">
-        </div>
-  
-        <div>
           <button id="sendPromptButton">Send Prompt</button>
         </div>
-      </div>
-      <div id="response"></div>
+        <div id="response"></div>
+      </section>
     </section>
-  `;  
+  `;
   }
   setupHome(); // attach all event listeners, load data, etc.
 }
@@ -110,9 +116,6 @@ function updateDialogueDisplay(
   responseDiv!.style.maxHeight = "300px"; // Set the desired max height for scrolling
 }
 
-function updateEntityLikeDisplay() {
-
-}
 
 function getPromptData(): PromptData {
   const userInput = (<HTMLInputElement>document.getElementById("userInput"))
@@ -139,6 +142,10 @@ function getPromptData(): PromptData {
   const responderType = selectedResponder.text.split(":")[0];
   const prompterName = selectedPrompter.text.split(":")[1];
   const responderName = selectedResponder.text.split(":")[1];
+
+  console.log("_PROMPTER_ID:", PROMPTER_ID);
+  console.log("_PROMPTER_NAME:", prompterName);
+  console.log("_PROMPTER_TYPE:", prompterType);
 
   return {
     userInput,
@@ -175,21 +182,25 @@ export async function handleSendPrompt(): Promise<void> {
   }
 }
 
-export async function handleGetEntityLike(entity_like: EntityLike): Promise<void> {
+async function handleGetEntityLike(
+  entity_like: EntityLike
+): Promise<void> {
   let data;
   const type = entity_like.type;
-  
-  if (type === 'entity') {
-    data = await sendGetEntity();  }
-  else if (type === 'npc') {
-    data = null;  }
-  else if (type === 'player') {
-    data = null;  }
-  else {
-    console.error('Invalid type:', type);
+  const ID = entity_like._id;
+
+  if (type === "Entity") {
+    data = await sendGetEntity(ID);
+  } else if (type === "NPC") {
+    data = await sendGetNPC(ID);
+  } else if (type === "Player") {
+    data = await sendGetPlayer(ID);
+  } else {
+    console.error("Invalid type:", type);
   }
 
-  console.log('data:', data);
+  console.log("data:", data);
+  return data;
 }
 
 async function handleEntityLikeData(): Promise<{
@@ -218,7 +229,7 @@ async function handleEntityLikeData(): Promise<{
 
 /**
  * Sends a prompt to the server and returns the response.
- * 
+ *
  * @endpoint {POST} API_ENDPOINTS.PROMPT
  */
 async function sendPrompt(formData: any): Promise<any> {
@@ -246,28 +257,78 @@ async function sendPrompt(formData: any): Promise<any> {
 
 /**
  * Sends a GET request to the server to retrieve an entity.
- * 
+ *
  * @endpoint {GET} API_ENDPOINTS.ENTITY
  */
-export async function sendGetEntity(): Promise<any> {
-  const url = API_ENDPOINTS.ENTITY;
-  const response = await fetch(url, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+export async function sendGetEntity(ID: string): Promise<any> {
+  const url = `${API_ENDPOINTS.ENTITY}/${ID}`; // Replace with your actual API endpoint
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    return await response.json(); // Assuming response is JSON
+  } catch (error) {
+    console.error("Error fetching entity:", error);
+    throw error;
   }
+}
 
-  return await response.json();
+/**
+ * Sends a GET request to the server to retrieve an NPC.
+ * @endpoint {GET} API_ENDPOINTS.NPC
+ */
+export async function sendGetNPC(ID: string): Promise<any> {
+  const url = `${API_ENDPOINTS.NPC}/${ID}`; // Replace with your actual API endpoint
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    return await response.json(); // Assuming response is JSON
+  } catch (error) {
+    console.error("Error fetching NPC:", error);
+    throw error;
+  }
+}
+
+/**
+ * Sends a GET request to the server to retrieve a Player.
+ *
+ * @endpoint {GET} API_ENDPOINTS.PLAYER
+ */
+export async function sendGetPlayer(ID: string): Promise<any> {
+  const url = `${API_ENDPOINTS.PLAYER}/${ID}`; // Replace with your actual API endpoint
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    return await response.json(); // Ass  uming response is JSON
+  } catch (error) {
+    console.error("Error fetching player:", error);
+    throw error;
+  }
 }
 
 /**
  * Sends a GET request to the server to retrieve all entity-like objects.
- * 
+ *
  * @endpoint {GET} API_ENDPOINTS.ALL
  */
 export async function sendGetAllEntityLike(): Promise<any> {
@@ -288,7 +349,7 @@ export async function sendGetAllEntityLike(): Promise<any> {
 
 /**
  * Sends a GET request to the server to retrieve all bots.
- * 
+ *
  * @endpoint {GET} API_ENDPOINTS.BOT
  */
 export async function sendGetAllBots(): Promise<any> {
@@ -350,51 +411,82 @@ async function loadBotSelect() {
 /**
  * Loads the prompter and responder info.
  */
-function loadPrompterResponderInfo() {
+async function updatePrompterResponderInfo() {
+  const prompterInfo = document.getElementById("prompterInfo");
+  const responderInfo = document.getElementById("responderInfo");
 
+  const prompterSelect = document.getElementById(
+    "prompterSelect"
+  ) as HTMLSelectElement;
+  const responderSelect = document.getElementById(
+    "responderSelect"
+  ) as HTMLSelectElement;
+
+  if (
+    prompterInfo === null ||
+    responderInfo === null ||
+    prompterSelect === null ||
+    responderSelect === null
+  ) {
+    console.error("Element not found.");
+    return;
+  }
+
+  const selectedPrompter = prompterSelect.selectedOptions[0];
+  const selectedResponder = responderSelect.selectedOptions[0];
+  // console.log("selectedPrompter:", selectedPrompter);
+  
+  const PROMPTER_ID = selectedPrompter.value;
+  const RESPONDER_ID = selectedResponder.value;
+  const prompterType = selectedPrompter.text.split(":")[0];
+  const responderType = selectedResponder.text.split(":")[0];
+  const prompterName = selectedPrompter.text.split(":")[1];
+  const responderName = selectedResponder.text.split(":")[1];
+
+  // console.log("PROMPTER_ID:", PROMPTER_ID);
+  // console.log("PROMPTER_NAME:", prompterName);
+  // console.log("PROMPTER_TYPE:", prompterType);
+  
+
+  const prompter: EntityLike = {
+    _id: PROMPTER_ID,
+    name: prompterName,
+    type: prompterType,
+  };
+  const responder: EntityLike = {
+    _id: RESPONDER_ID,
+    name: responderName,
+    type: responderType,
+  };
+
+
+  const prompterJson = await handleGetEntityLike(prompter);
+  const responderJson = await handleGetEntityLike(responder);
+
+  prompterInfo.textContent = JSON.stringify(prompterJson, null, 2);
+  responderInfo.textContent = JSON.stringify(responderJson, null, 2);
 }
-
-// /**
-//  * Sets up the collapsible options.
-//  */
-// function setupCollapsible() {
-//   console.log('setupCollapsible called! with querySelector.')
-//   const toggle = document.querySelector('toggle') as HTMLInputElement;
-//   const collapsible = document.querySelector('.collapsible.open') as HTMLElement;
-//   if (toggle === null) {console.error('Collapsible toggle not found.');}
-//   if (collapsible === null) {console.error('Collapsible elements not found.');}
-
-//   toggle.addEventListener('change', function() {
-//     console.log(collapsible.classList);
-//     if (toggle.checked) {
-//       if (collapsible.classList.contains('open')) {
-//         collapsible.classList.remove('open');
-//       }
-//     } else {
-//       if (!collapsible.classList.contains('open')) {
-//         collapsible.classList.add('open');
-//       }
-//     }
-//     console.log(collapsible.classList);
-//   });
-// }
 
 /**
  * Sets up the collapsible options.
  */
 function setupCollapsibles() {
-  console.log('setupCollapsibles called! with querySelectorAll.');
+  console.log("setupCollapsibles called! with querySelectorAll.");
 
-  const toggles = document.querySelectorAll('.toggle') as NodeListOf<HTMLInputElement>;
-  const collapsibles = document.querySelectorAll('.collapsible.open') as NodeListOf<HTMLElement>;
+  const toggles = document.querySelectorAll(
+    ".toggle"
+  ) as NodeListOf<HTMLInputElement>;
+  const collapsibles = document.querySelectorAll(
+    ".collapsible.open"
+  ) as NodeListOf<HTMLElement>;
 
   if (toggles.length === 0) {
-    console.error('No collapsible toggle elements found.');
+    console.error("No collapsible toggle elements found.");
     return; // Exit function if no toggles found
   }
 
   if (collapsibles.length === 0) {
-    console.error('No collapsible elements found.');
+    console.error("No collapsible elements found.");
     return; // Exit function if no collapsibles found
   }
 
@@ -402,16 +494,16 @@ function setupCollapsibles() {
   toggles.forEach((toggle, index) => {
     const collapsible = collapsibles[index]; // Match each toggle with its corresponding collapsible
 
-    toggle.addEventListener('change', function() {
+    toggle.addEventListener("change", function () {
       console.log(collapsible.classList);
 
       if (toggle.checked) {
-        if (collapsible.classList.contains('open')) {
-          collapsible.classList.remove('open');
+        if (collapsible.classList.contains("open")) {
+          collapsible.classList.remove("open");
         }
       } else {
-        if (!collapsible.classList.contains('open')) {
-          collapsible.classList.add('open');
+        if (!collapsible.classList.contains("open")) {
+          collapsible.classList.add("open");
         }
       }
 
@@ -420,46 +512,45 @@ function setupCollapsibles() {
   });
 }
 
-
 /**
  * Sets up everything in the home page.
  */
-function setupHome() {
-  console.log('setupHome called!')
+async function setupHome() {
+  console.log("setupHome called!");
+
   const sendPromptButton = document.getElementById("sendPromptButton");
-  if (sendPromptButton) {
-    sendPromptButton.addEventListener("click", handleSendPrompt);
-  } else {
-    console.error('Button with ID "sendPromptButton" not found.');
-  }
   const botSelect = document.getElementById("botSelect");
-  if (botSelect) {
-    loadBotSelect();
-  } else {
-    console.error('Dropdown with ID "botSelect" not found.');
-  }
   const prompterSelect = document.getElementById("prompterSelect");
   const responderSelect = document.getElementById("responderSelect");
-  if (prompterSelect && responderSelect) {
-    loadEntityLikeDropdown();
-  } else {
+  const jsonDisplay = document.getElementById("jsonDisplay");
+
+  if (!sendPromptButton) {
+    console.error('Button with ID "sendPromptButton" not found.');
+    return;
+  }
+  if (!botSelect) {
+    console.error('Dropdown with ID "botSelect" not found.');
+    return;
+  }
+  if (!prompterSelect || !responderSelect || !jsonDisplay) {
     console.error(
-      'Dropdowns with IDs "prompterSelect" and "responderSelect" not found.'
+      'Missing element: prompterSelect, responderSelect, and/or jsonContent'
     );
+    return;
   }
+
+  // Setup event listeners and load data
+  sendPromptButton.addEventListener("click", handleSendPrompt);
+  loadBotSelect();
+  await loadEntityLikeDropdown();
+  await updatePrompterResponderInfo();
+
+  // Listen for changes in the entity-like dropdowns
+  const entitylikeDropdowns = document.querySelectorAll(".entitylikeDropdown");
+  entitylikeDropdowns.forEach(dropdown => {
+    dropdown.addEventListener("change", updatePrompterResponderInfo);
+  });
+
   setupCollapsibles();
-  loadPrompterResponderInfo();
-  loadCharacterInfo(); // DELETEME
 }
 
-function loadCharacterInfo() {
-  const characterInfo = {
-    name: "Aragorn",
-    race: "Human"
-  };
-
-  const jsonContent = document.getElementById('jsonContent');
-  if (jsonContent) {
-    jsonContent.textContent = JSON.stringify(characterInfo, null, 2);
-  }
-}

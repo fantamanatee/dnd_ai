@@ -65,6 +65,11 @@ section {
     border-bottom: 1px solid var(--section-border);
 }
 
+.indent-section {
+    padding: 1rem;
+    margin: 0;
+}
+
 p {
     margin: 0.5rem 0;
 }
@@ -76,6 +81,8 @@ div {
 label {
     display: block;
     margin: 0.5rem 0 0.2rem 0;
+    color: #888; /* Lighter color than default text */
+    font-size: 0.9rem; /* Smaller font size than default */
 }
 
 input[type="text"] {
@@ -217,6 +224,7 @@ body.dark-mode {
     display: flex;
     align-items: center; /* Align items vertically in center */
     gap: 8px; /* Adjust spacing between label and toggle */
+    margin: 0;
   }
 
   .toggle-container label {
