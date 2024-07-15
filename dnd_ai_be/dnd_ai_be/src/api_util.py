@@ -102,14 +102,25 @@ def handle_get_all_entity_like() -> Response:
 
     return jsonify(response)
 
+# @query_blueprint.route('/entity/<string:_id>', methods=['GET'])
+# def handle_get_entity(_id: str) -> Response:
+#     try:
+#         entity = Entity(ID=_id)
+#     except:
+#         return jsonify({'message': f'Entity with ID {_id} does not exist.'})
+#     response = entity.to_dict()
+#     return jsonify(response)
+
 @query_blueprint.route('/entity/<string:_id>', methods=['GET'])
-def handle_get_entity(_id: str) -> Response:
+def handle_get_entity(_id: str):
     try:
         entity = Entity(ID=_id)
-    except:
-        return jsonify({'message': f'Entity with ID {_id} does not exist.'})
-    response = entity.to_dict()
-    return jsonify(response)
+        entity_data = entity.to_dict()
+        if not entity_data:
+            return jsonify({'message': f'Entity with ID {_id} does not exist.'}), 404
+        return jsonify(entity_data)
+    except Exception as e:
+        return jsonify({'message': f'Error retrieving entity: {str(e)}'}), 500
 
 @query_blueprint.route('/npc/<string:_id>', methods=['GET'])
 def handle_get_npc(_id: str) -> Response:
