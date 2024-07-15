@@ -143,9 +143,6 @@ function getPromptData(): PromptData {
   const prompterName = selectedPrompter.text.split(":")[1];
   const responderName = selectedResponder.text.split(":")[1];
 
-  console.log("_PROMPTER_ID:", PROMPTER_ID);
-  console.log("_PROMPTER_NAME:", prompterName);
-  console.log("_PROMPTER_TYPE:", prompterType);
 
   return {
     userInput,
@@ -199,7 +196,6 @@ async function handleGetEntityLike(
     console.error("Invalid type:", type);
   }
 
-  console.log("data:", data);
   return data;
 }
 
@@ -434,7 +430,6 @@ async function updatePrompterResponderInfo() {
 
   const selectedPrompter = prompterSelect.selectedOptions[0];
   const selectedResponder = responderSelect.selectedOptions[0];
-  // console.log("selectedPrompter:", selectedPrompter);
   
   const PROMPTER_ID = selectedPrompter.value;
   const RESPONDER_ID = selectedResponder.value;
@@ -443,9 +438,6 @@ async function updatePrompterResponderInfo() {
   const prompterName = selectedPrompter.text.split(":")[1];
   const responderName = selectedResponder.text.split(":")[1];
 
-  // console.log("PROMPTER_ID:", PROMPTER_ID);
-  // console.log("PROMPTER_NAME:", prompterName);
-  // console.log("PROMPTER_TYPE:", prompterType);
   
 
   const prompter: EntityLike = {
@@ -471,7 +463,6 @@ async function updatePrompterResponderInfo() {
  * Sets up the collapsible options.
  */
 function setupCollapsibles() {
-  console.log("setupCollapsibles called! with querySelectorAll.");
 
   const toggles = document.querySelectorAll(
     ".toggle"
@@ -495,7 +486,6 @@ function setupCollapsibles() {
     const collapsible = collapsibles[index]; // Match each toggle with its corresponding collapsible
 
     toggle.addEventListener("change", function () {
-      console.log(collapsible.classList);
 
       if (toggle.checked) {
         if (collapsible.classList.contains("open")) {
@@ -507,7 +497,6 @@ function setupCollapsibles() {
         }
       }
 
-      console.log(collapsible.classList);
     });
   });
 }
@@ -516,7 +505,6 @@ function setupCollapsibles() {
  * Sets up everything in the home page.
  */
 async function setupHome() {
-  console.log("setupHome called!");
 
   const sendPromptButton = document.getElementById("sendPromptButton");
   const botSelect = document.getElementById("botSelect");
