@@ -194,11 +194,8 @@ body.dark-mode {
     padding: 5px 0;
     position: absolute;
     z-index: 1;
-    bottom: 125%; /* Position above */
-    left: 50%;
-    margin-left: -60px;
     opacity: 0;
-    transition: opacity 0.3s;
+    transition: visibility 0.2s, opacity 0.2s;
   }
   
   .tooltip:hover .tooltiptext {
@@ -216,6 +213,21 @@ body.dark-mode {
     max-height: 1000px; /* Adjust as needed, this value should be more than enough */
   }
   
+  .toggle-container {
+    display: flex;
+    align-items: center; /* Align items vertically in center */
+    gap: 8px; /* Adjust spacing between label and toggle */
+  }
+
+  .toggle-container label {
+    order: 1; /* Place label before the checkbox */
+  }
+
+  .toggle-container input[type="checkbox"] {
+    order: 2; /* Place checkbox after the label */
+  }
+
+  
   .toggle-label {
     display: block;
     background-color: #f0f0f0;
@@ -223,15 +235,15 @@ body.dark-mode {
     cursor: pointer;
   }
   
-  /* .content {
-    overflow: hidden;
-    max-height: 0;
-    transition: max-height 0.3s ease-out;
+
+  fieldset {
+    border: none;
+    padding: 0;
+    margin: 0;
   }
   
-  .content label,
-  .content select {
-    display: block;
+  legend {
+    font-size: 1.2rem;
     margin-bottom: 0.5rem;
   }
-   */
+  

@@ -9,6 +9,7 @@ function handleNavigation(event: Event) {
   const page = target.getAttribute("data-page");
 
   if (page === "home") {
+    console.log('calling renderHome using handleNavigation')
     renderHome();
   } else if (page === "character-builder") {
     renderCharacterBuilder();
@@ -24,7 +25,8 @@ document.querySelectorAll("nav a").forEach((link) => {
   link.addEventListener("click", handleNavigation);
 });
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener('DOMContentLoaded', () => {
+  renderHome();
   const themeToggle = document.getElementById("themeToggle");
   // Optionally, check for saved preference in localStorage
   if (localStorage.getItem("theme") === "dark") {
@@ -32,7 +34,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   themeToggle!.addEventListener("click", () => {
-    document.body.classList.toggle("dark-mode");
+    const dark = document.body.classList.toggle("dark-mode");
+    console.log("Theme toggle is now ", dark ? "dark" : "light");
     // Save preference to localStorage
     if (document.body.classList.contains("dark-mode")) {
       localStorage.setItem("theme", "dark");
@@ -40,8 +43,4 @@ document.addEventListener("DOMContentLoaded", () => {
       localStorage.setItem("theme", "light");
     }
   });
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-  renderHome();
 });
