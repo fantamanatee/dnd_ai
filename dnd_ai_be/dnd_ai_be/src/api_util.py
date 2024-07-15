@@ -102,11 +102,31 @@ def handle_get_all_entity_like() -> Response:
 
     return jsonify(response)
 
-@query_blueprint.route('/entity', methods=['GET'])
-def handle_get_entity() -> Response:
-    data = request.json
-    entity = Entity(**data)
-    response = entity.get_data()
+@query_blueprint.route('/entity/<string:_id>', methods=['GET'])
+def handle_get_entity(_id: str) -> Response:
+    try:
+        entity = Entity(ID=_id)
+    except:
+        return jsonify({'message': f'Entity with ID {_id} does not exist.'})
+    response = entity.to_dict()
+    return jsonify(response)
+
+@query_blueprint.route('/npc/<string:_id>', methods=['GET'])
+def handle_get_npc(_id: str) -> Response:
+    try:
+        npc = NPC(ID=_id)
+    except:
+        return jsonify({'message': f'NPC with ID {_id} does not exist.'})
+    response = npc.to_dict()
+    return jsonify(response)
+
+@query_blueprint.route('/player/<string:_id>', methods=['GET'])
+def handle_get_player(_id: str) -> Response:
+    try:
+        player = Player(ID=_id)
+    except:
+        return jsonify({'message': f'Player with ID {_id} does not exist.'})
+    response = player.to_dict()
     return jsonify(response)
 
 @query_blueprint.route('/bot', methods=['POST'])

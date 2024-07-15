@@ -61,6 +61,9 @@ class Entity:
     def set_description(self, description: str) -> None:
         self.col.update_one({'_id': self.ID}, {'$set': {'description': description}})
     
+    def to_dict(self, show_id = False) -> dict:
+        return self.col.find_one({'_id': self.ID}, {'_id': show_id})
+        
     def get_context_str(self) -> str:
         ''' Returns a string representation of the entity for prompt context.
         '''
