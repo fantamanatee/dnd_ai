@@ -61,6 +61,9 @@ class Entity:
     def set_description(self, description: str) -> None:
         self.col.update_one({'_id': self.ID}, {'$set': {'description': description}})
     
+    def to_dict(self, show_id = False) -> dict:
+        return self.col.find_one({'_id': self.ID}, {'_id': show_id})
+        
     def get_context_str(self) -> str:
         ''' Returns a string representation of the entity for prompt context.
         '''
@@ -183,7 +186,13 @@ class Player(Character):
         '''
         context = f"Player information:\n\nPlayer Class: {self.get_player_class()}\nLevel: {self.get_level()}\nName: {self.get_name()}\nRace: {self.get_race()}\nTags: {self.get_tags()}\nDescription: {self.get_description()}\nLore: {self.get_lore()}"
         return context
+    
 
+entity_like_classes = {
+    'Entity': Entity,
+    'NPC': NPC,
+    'Player': Player
+}
 
 if __name__ == '__main__':
     pass

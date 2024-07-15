@@ -105,3 +105,27 @@ export function validateBot(obj: any): Bot {
   return obj as Bot;
 }
 
+export class DialogueHandler {
+  private dialogue: { prompt: string; response: string }[];
+
+  constructor() {
+    this.dialogue = [];
+  }
+
+  public getDialogue(): { prompt: string; response: string }[] {
+    return this.dialogue;
+  }
+
+  public addToDialogue(prompt: string, response: string): void {
+    this.dialogue.push({ prompt, response });
+
+    if (this.dialogue.length > 5) {
+      this.dialogue = this.dialogue.slice(-5);
+    }
+  }
+
+  public clearDialogue(): void {
+    this.dialogue = [];
+  }
+}
+

@@ -65,6 +65,11 @@ section {
     border-bottom: 1px solid var(--section-border);
 }
 
+.indent-section {
+    padding: 1rem;
+    margin: 0;
+}
+
 p {
     margin: 0.5rem 0;
 }
@@ -76,6 +81,8 @@ div {
 label {
     display: block;
     margin: 0.5rem 0 0.2rem 0;
+    color: #888; /* Lighter color than default text */
+    font-size: 0.9rem; /* Smaller font size than default */
 }
 
 input[type="text"] {
@@ -178,3 +185,73 @@ body.dark-mode {
     --response-background: #3a354b;
     --response-text: #c5c3da;
   }
+
+  .tooltip {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 5px;
+    padding: 5px 0;
+    position: absolute;
+    z-index: 1;
+    opacity: 0;
+    transition: visibility 0.2s, opacity 0.2s;
+  }
+  
+  .tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+  }
+  
+  .collapsible {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+  }
+  
+  .collapsible.open {
+    max-height: 1000px; /* Adjust as needed, this value should be more than enough */
+  }
+  
+  .toggle-container {
+    display: flex;
+    align-items: center; /* Align items vertically in center */
+    gap: 8px; /* Adjust spacing between label and toggle */
+    margin: 0;
+  }
+
+  .toggle-container label {
+    order: 1; /* Place label before the checkbox */
+  }
+
+  .toggle-container input[type="checkbox"] {
+    order: 2; /* Place checkbox after the label */
+  }
+
+  
+  .toggle-label {
+    display: block;
+    background-color: #f0f0f0;
+    padding: 0.5rem;
+    cursor: pointer;
+  }
+  
+
+  fieldset {
+    border: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  legend {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+  }
+  
