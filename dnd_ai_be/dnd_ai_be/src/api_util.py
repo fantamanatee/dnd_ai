@@ -12,7 +12,16 @@ query_blueprint = Blueprint('query_blueprint', __name__)
 # Time to load entity2: 0.02063918113708496
 # Time to get answer: 2.5123660564422607
 
-@query_blueprint.route('/prompt', methods=['POST'])
+class ROUTES:
+    PROMPT = "/prompt"
+    ENTITY = "/entity"
+    NPC = "/npc"
+    PLAYER = "/player"
+    ALL = "/all"
+    BOT = "/bot"
+    SESSION = "/session"
+
+@query_blueprint.route(ROUTES.PROMPT, methods=['POST'])
 @timer()
 def handle_prompt() -> Response:
     ''' Handle POST requests to /prompt endpoint.
@@ -60,14 +69,14 @@ def handle_prompt() -> Response:
     
     return jsonify({'message': answer})
 
-@query_blueprint.route('/entity', methods=['POST'])
+@query_blueprint.route(ROUTES.ENTITY, methods=['POST'])
 def handle_construct_entity() -> Response:
     data = request.json
     entity = Entity(**data) 
     response = f"Entity created: {entity.get_name()}"
     return jsonify({'message':response})
 
-@query_blueprint.route('/npc', methods=['POST'])
+@query_blueprint.route(ROUTES.NPC, methods=['POST'])
 def handle_construct_npc() -> Response:
     data = request.json
     npc = NPC(**data)
@@ -75,7 +84,7 @@ def handle_construct_npc() -> Response:
     print(response)
     return jsonify({'message':response})
 
-@query_blueprint.route('/player', methods=['POST'])
+@query_blueprint.route(ROUTES.PLAYER, methods=['POST'])
 def handle_construct_player() -> Response:
     data = request.json
     player = Player(**data)
@@ -83,7 +92,7 @@ def handle_construct_player() -> Response:
     print(response)
     return jsonify({'message':response})
 
-@query_blueprint.route('/all', methods=['GET'])
+@query_blueprint.route(ROUTES.ALL, methods=['GET'])
 def handle_get_all_entity_like() -> Response:
 
     entities = DB.Entities.find({'race':{'$exists':'1', '$ne': 'null', '$ne': 'None'}},{'race':1})
@@ -102,16 +111,7 @@ def handle_get_all_entity_like() -> Response:
 
     return jsonify(response)
 
-# @query_blueprint.route('/entity/<string:_id>', methods=['GET'])
-# def handle_get_entity(_id: str) -> Response:
-#     try:
-#         entity = Entity(ID=_id)
-#     except:
-#         return jsonify({'message': f'Entity with ID {_id} does not exist.'})
-#     response = entity.to_dict()
-#     return jsonify(response)
-
-@query_blueprint.route('/entity/<string:_id>', methods=['GET'])
+@query_blueprint.route(f'{ROUTES.ENTITY}/<string:_id>', methods=['GET'])
 def handle_get_entity(_id: str):
     try:
         entity = Entity(ID=_id)
@@ -122,7 +122,7 @@ def handle_get_entity(_id: str):
     except Exception as e:
         return jsonify({'message': f'Error retrieving entity: {str(e)}'}), 500
 
-@query_blueprint.route('/npc/<string:_id>', methods=['GET'])
+@query_blueprint.route(f'{ROUTES.NPC}/<string:_id>', methods=['GET'])
 def handle_get_npc(_id: str) -> Response:
     try:
         npc = NPC(ID=_id)
@@ -131,7 +131,7 @@ def handle_get_npc(_id: str) -> Response:
     response = npc.to_dict()
     return jsonify(response)
 
-@query_blueprint.route('/player/<string:_id>', methods=['GET'])
+@query_blueprint.route(f'{ROUTES.PLAYER}/<string:_id>', methods=['GET'])
 def handle_get_player(_id: str) -> Response:
     try:
         player = Player(ID=_id)
@@ -140,7 +140,7 @@ def handle_get_player(_id: str) -> Response:
     response = player.to_dict()
     return jsonify(response)
 
-@query_blueprint.route('/bot', methods=['POST'])
+@query_blueprint.route(ROUTES.BOT, methods=['POST'])
 def handle_construct_bot() -> Response:
     print('Constructing bot...')
     data = request.json
@@ -149,7 +149,7 @@ def handle_construct_bot() -> Response:
     print(response)
     return jsonify({'message':response})
 
-@query_blueprint.route('/bot', methods=['GET'])
+@query_blueprint.route(ROUTES.BOT, methods=['GET'])
 def handle_get_all_bots() -> Response:
     bots = DB.Bots.find({'_id':{'$exists':'1', '$ne': 'null'}, 'name':{'$exists':'1'}})
     bots = [b for b in bots]
@@ -161,5 +161,9 @@ def handle_get_all_bots() -> Response:
     return jsonify(response)
 
 
-
-    
+@query_blueprint.route(ROUTES.SESSION, methods=['DELETE'])
+def handle_clear_all_sessions() -> Response:
+    DB.Sessions.delete_many({}) 
+    print('cleared sessions')
+    response = f'All Sessions cleared. In collection {DB.name}.{DB.Sessions.name}.'
+    return jsonify(response)
