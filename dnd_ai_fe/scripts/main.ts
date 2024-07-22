@@ -1,6 +1,7 @@
 import { renderHome } from "./home";
 import { renderBotBuilder } from "./bot_builder";
 import { renderCharacterBuilder } from "./character_builder";
+import { clearAllSessionsOnPageExit } from "./util"; 
 
 // Router function to handle navigation
 function handleNavigation(event: Event) {
@@ -19,6 +20,7 @@ function handleNavigation(event: Event) {
     console.error("Page not found");
   }
 }
+
 
 // Listen for link clicks in the navigation.
 document.querySelectorAll("nav a").forEach((link) => {
@@ -44,3 +46,5 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
+clearAllSessionsOnPageExit();
