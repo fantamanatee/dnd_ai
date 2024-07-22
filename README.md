@@ -13,7 +13,7 @@ The front end is written from scratch using TypeScript, HTML, and CSS for a seam
 The default chatbot is based on LangChain's tutorial: [qa with chat history](https://python.langchain.com/v0.1/docs/use_cases/question_answering/chat_history/)
 
 The advanced reasoning agent is based on this paper for creating interactive agents using architectural and interaction patterns for enabling
-believable simulations of human behavior: [Generative Agents: Interactive Simulacra of Human Behavior](https://arxiv.org/pdf/2304.03442).
+believable simulations of human behavior: [Generative Agents: Interactive Simulacra of Human Behavior](https://arxiv.org/abs/2304.03442).
 
 All interactions are handled via a RESTful API.
 
@@ -23,7 +23,7 @@ All interactions are handled via a RESTful API.
 - **Database**: MongoDB Atlas cluster
 
 ### References:
-- **TODO cite paper**
+- Park, J. S., O'Brien, J. C., Cai, C. J., Morris, M. R., Liang, P., & Bernstein, M. S. (2023). *Generative agents: Interactive simulacra of human behavior*. arXiv. https://arxiv.org/abs/2304.03442
 
 ## License
 📜 [MIT License](https://choosealicense.com/licenses/mit/)
