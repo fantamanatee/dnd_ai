@@ -7,7 +7,7 @@ Welcome to DnD_AI, the ultimate WebApp for Dungeons and Dragons enthusiasts to c
 
 ## Demo
 <a href="https://www.loom.com/share/bf91bb8bbe694e00819915c3edc4952c?sid=7250e00d-6dc8-4e1a-b007-5d3fcf527acc" target="_blank" title="DnD_AI Demo">
-  <img src="https://github.com/fantamanatee/CoverMate/blob/a66f1394e664d61919aed5ac43925c821e36799e/CoverMate.jpeg" alt="DnD_AI Demo" style="width: 50%; max-width: 100%; height: auto;">
+  <img src="https://github.com/fantamanatee/dnd_ai/blob/8d706d7c463552ea51200519edbbf1fc266eb032/dnd_ai_thmbnail.png" alt="DnD_AI Demo" style="width: 50%; max-width: 100%; height: auto;">
 </a>
 
 ## Architecture
