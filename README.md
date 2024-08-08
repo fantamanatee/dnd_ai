@@ -3,7 +3,7 @@
 Welcome to DnD_AI, the ultimate WebApp for Dungeons and Dragons enthusiasts to create and interact with AI characters!
 
 ## Current Deployment
-🔗 **Try it out!** [DnD AI](https://tinyurl.com/DnD-bot-ai)
+🔗 **Try it out!** [DnD AI]([https://tinyurl.com/DnD-bot-ai](https://charming-ganache-286033.netlify.app/))
 
 ## Architecture
 The back end harnesses the power of LangChain and OpenAI's API to deliver robust chatbot functionality. Character, session, and bot data are securely stored in MongoDB.
