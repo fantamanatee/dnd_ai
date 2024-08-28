@@ -70,7 +70,10 @@ class EntityLike:
             self.stats = stats
 
     def get_name(self) -> str:
-        return self.get_race()
+        return self.col.find_one({"_id": self.ID}).get("name", "unknown")
+
+    def set_name(self, name: str) -> None:
+        self.col.update_one({"_id": self.ID}, {"$set": {"name": name}})
 
     def get_race(self) -> str:
         return self.col.find_one({"_id": self.ID}).get("race", "unknown")
@@ -101,23 +104,9 @@ class EntityLike:
     def to_dict(self, show_id=False) -> dict:
         return self.col.find_one({"_id": self.ID}, {"_id": show_id})
 
-    def get_context_str(self) -> str:
-        """Returns a string representation of the entity for prompt context."""
-        context_lines = ["Entity information:"]
-
-        if self.get_name():
-            context_lines.append(f"Name: {self.get_name()}")
-        if self.get_race():
-            context_lines.append(f"Race: {self.get_race()}")
-        if self.get_tags():
-            context_lines.append(f"Tags: {self.get_tags()}")
-        if self.get_description():
-            context_lines.append(f"Description: {self.get_description()}")
-        if self.get_stats():
-            context_lines.append(f"Stats: {self.get_stats()}")
-
-        context = "\n".join(context_lines)
-        return context
+    # def get_context_str(self) -> str:
+    #     """Returns a string representation of the entity for prompt context."""
+    #     pass
 
 
 class Entity(EntityLike):
@@ -158,6 +147,7 @@ class Entity(EntityLike):
                 self.ID = ID
         else:
             data = {
+                "name": f"{race}1",
                 "race": race,
                 "tags": tags,
                 "description": description,
@@ -237,10 +227,10 @@ class NPC(Character, EntityLike):
     def get_name(self) -> str:
         return self.col.find_one({"_id": self.ID}).get("name", "unknown")
 
-    def get_context_str(self) -> str:
-        """Returns a string representation of the npc for prompt context."""
-        context = f"NPC information:\nRole: {self.get_role()}\nName: {self.get_name()}\nRace: {self.get_race()}\nTags: {self.get_tags()}\nDescription: {self.get_description()} \nStats: {self.get_stats()} \nLore: {self.get_lore()}"
-        return context
+    # def get_context_str(self) -> str:
+    #     """Returns a string representation of the npc for prompt context."""
+    #     context = f"NPC information:\nRole: {self.get_role()}\nName: {self.get_name()}\nRace: {self.get_race()}\nTags: {self.get_tags()}\nDescription: {self.get_description()} \nStats: {self.get_stats()} \nLore: {self.get_lore()}"
+    #     return context
 
 
 class Player(Character, EntityLike):
@@ -297,74 +287,74 @@ class Player(Character, EntityLike):
     def get_name(self) -> str:
         return self.col.find_one({"_id": self.ID}).get("name", "unknown")
 
-    def get_context_str(self) -> str:
-        """Returns a string representation of the player for prompt context."""
-        context = f"Player information:\nPlayer Class: {self.get_player_class()}\nLevel: {self.get_level()}\nName: {self.get_name()}\nRace: {self.get_race()}\nTags: {self.get_tags()}\nDescription: {self.get_description()} \nStats: {self.get_stats()} \nLore: {self.get_lore()}"
-        return context
+    # def get_context_str(self) -> str:
+    #     """Returns a string representation of the player for prompt context."""
+    #     context = f"Player information:\nPlayer Class: {self.get_player_class()}\nLevel: {self.get_level()}\nName: {self.get_name()}\nRace: {self.get_race()}\nTags: {self.get_tags()}\nDescription: {self.get_description()} \nStats: {self.get_stats()} \nLore: {self.get_lore()}"
+    #     return context
 
 
 entity_like_classes = {"Entity": Entity, "NPC": NPC, "Player": Player}
 
-if __name__ == "__main__":
-    pass
+# if __name__ == "__main__":
+#     pass
 
-    # Example Entity
-    example_entity = Entity(
-        race="Orc",
-        tags=["Hostile"],
-        description="A brutish, aggressive, ugly, and malevolent monster",
-        stats={
-            "strength": 16,
-            "dexterity": 10,
-            "constitution": 14,
-            "intelligence": 7,
-            "wisdom": 8,
-            "charisma": 6,
-        },
-    )
+#     # Example Entity
+#     example_entity = Entity(
+#         race="Orc",
+#         tags=["Hostile"],
+#         description="A brutish, aggressive, ugly, and malevolent monster",
+#         stats={
+#             "strength": 16,
+#             "dexterity": 10,
+#             "constitution": 14,
+#             "intelligence": 7,
+#             "wisdom": 8,
+#             "charisma": 6,
+#         },
+#     )
 
-    print(example_entity.get_context_str())
+#     print(example_entity.get_context_str())
 
-    # Example Player
-    example_player = Player(
-        player_class="Ranger",
-        level=5,
-        name="Legolas",
-        lore=[
-            "Trained in the art of archery from a young age",
-            "Guardian of the forest",
-        ],
-        race="Elf",
-        tags=["Friendly", "Archer", "Stealthy"],
-        description="A skilled archer with a knack for stealth and agility.",
-        stats={
-            "strength": 12,
-            "dexterity": 18,
-            "constitution": 14,
-            "intelligence": 14,
-            "wisdom": 16,
-            "charisma": 10,
-        },
-    )
-    print(example_player.get_context_str())
+#     # Example Player
+#     example_player = Player(
+#         player_class="Ranger",
+#         level=5,
+#         name="Legolas",
+#         lore=[
+#             "Trained in the art of archery from a young age",
+#             "Guardian of the forest",
+#         ],
+#         race="Elf",
+#         tags=["Friendly", "Archer", "Stealthy"],
+#         description="A skilled archer with a knack for stealth and agility.",
+#         stats={
+#             "strength": 12,
+#             "dexterity": 18,
+#             "constitution": 14,
+#             "intelligence": 14,
+#             "wisdom": 16,
+#             "charisma": 10,
+#         },
+#     )
+#     print(example_player.get_context_str())
 
-    example_npc = NPC(
-        role="Scout",
-        name="Gobbo",
-        lore=[
-            "Known to ambush travelers",
-            "Has a network of tunnels",
-        ],
-        race="Goblin",
-        tags=["Hostile", "Cunning"],
-        description="A small, green creature known for his cunning and mischief.",
-        stats={
-            "strength": 8,
-            "dexterity": 16,
-            "constitution": 10,
-            "intelligence": 12,
-            "wisdom": 10,
-            "charisma": 8,
-        },
-    )
-    print(example_player.get_context_str())
+#     example_npc = NPC(
+#         role="Scout",
+#         name="Gobbo",
+#         lore=[
+#             "Known to ambush travelers",
+#             "Has a network of tunnels",
+#         ],
+#         race="Goblin",
+#         tags=["Hostile", "Cunning"],
+#         description="A small, green creature known for his cunning and mischief.",
+#         stats={
+#             "strength": 8,
+#             "dexterity": 16,
+#             "constitution": 10,
+#             "intelligence": 12,
+#             "wisdom": 10,
+#             "charisma": 8,
+#         },
+#     )
+#     print(example_player.get_context_str())
