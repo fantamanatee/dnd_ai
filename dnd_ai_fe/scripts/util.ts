@@ -1,4 +1,5 @@
 import { DropdownItem, EntityLike, Entity, NPC, Player, Bot } from "./interface";
+import { API_ENDPOINTS } from "./config";
 
 export function populateAppendDropdown(
   dropdown: HTMLSelectElement,
@@ -129,3 +130,30 @@ export class DialogueHandler {
   }
 }
 
+
+export function clearAllSessionsOnPageExit() {
+  /**
+   * Event listener to clear all sessions when the page is exited.
+   * 
+   *  @endpoint {DELETE} API_ENDPOINTS.ENTITY
+   */
+  window.addEventListener('DOMContentLoaded', async (event) => {
+      try {
+          const url = API_ENDPOINTS.SESSION;
+          const response = await fetch(url, {
+              method: 'DELETE',
+              headers: {
+                  'Content-Type': 'application/json'
+              }
+          });
+
+          if (!response.ok) {
+              console.error('Failed to clear sessions:', response.statusText);
+          } else {
+              console.log('All sessions cleared successfully.');
+          }
+      } catch (error) {
+          console.error('Error clearing sessions:', error);
+      }
+  });
+}

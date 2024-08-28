@@ -7,7 +7,7 @@ import {
   validateNPC,
   validatePlayer,
 } from "./util";
-import { Entity, NPC, Player, EntityLike, DropdownItem } from "./interface";
+import { Entity, NPC, Player, DropdownItem } from "./interface";
 
 export function renderCharacterBuilder() {
   const mainContent = document.getElementById("main-content");
@@ -43,6 +43,14 @@ const exampleEntity: Entity = {
   race: "Orc",
   tags: ["Hostile"],
   description: "A brutish, aggressive, ugly, and malevolent monster",
+  stats:{
+    strength: 16,
+    dexterity: 10,
+    constitution: 14,
+    intelligence: 7,
+    wisdom: 8,
+    charisma: 6
+  }
 };
 const examplePlayer: Player = {
   name: "Legolas",
@@ -55,6 +63,14 @@ const examplePlayer: Player = {
     "Trained in the art of archery from a young age",
     "Guardian of the forest",
   ],
+  stats: {
+    strength: 12,
+    dexterity: 18,
+    constitution: 14,
+    intelligence: 14,
+    wisdom: 16,
+    charisma: 10
+  },
 };
 const exampleNPC: NPC = {
   name: "Gobbo",
@@ -63,6 +79,14 @@ const exampleNPC: NPC = {
   description: "A small, green creature known for his cunning and mischief.",
   role: "Scout",
   lore: ["Known to ambush travelers", "Has a network of tunnels"],
+  stats: {
+    strength: 8,
+    dexterity: 16,
+    constitution: 10,
+    intelligence: 12,
+    wisdom: 10,
+    charisma: 8
+  },
 };
 
 async function loadEntityLikeTypeSelect() {
