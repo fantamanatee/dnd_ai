@@ -415,8 +415,10 @@ class RunnableWithMessageHistory(RunnableBindingBase):
         if isinstance(input_val, str):
             from langchain_core.messages import HumanMessage
 
-            # return [HumanMessage(content=input_val)]
-            return [HumanMessage(content=f"{self.input_prefix}: {input_val}")]
+            if self.input_prefix is None:
+                return [HumanMessage(content=input_val)]
+            else:
+                return [HumanMessage(content=f"{self.input_prefix}: {input_val}")]
 
         # If value is a single message, convert to a list
         elif isinstance(input_val, BaseMessage):
@@ -462,7 +464,10 @@ class RunnableWithMessageHistory(RunnableBindingBase):
         if isinstance(output_val, str):
             from langchain_core.messages import AIMessage
 
-            return [AIMessage(content=f"{self.output_prefix}: {output_val}")]
+            if self.output_prefix is None:
+                return [AIMessage(content=output_val)]
+            else:
+                return [AIMessage(content=f"{self.output_prefix}: {output_val}")]
         # If value is a single message, convert to a list
         elif isinstance(output_val, BaseMessage):
             return [output_val]
