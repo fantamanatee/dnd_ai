@@ -2,10 +2,10 @@ from dnd_ai_be.src.bots import ChatBot
 from bson import ObjectId
 from dnd_ai_be.src.characters import Player, Entity, NPC
 from langchain_community.chat_message_histories import ChatMessageHistory
-from langchain_core.messages import AIMessage, ChatMessage
+from langchain_core.messages.ai import AIMessage
 import json
 import os
-from argparse import ArgumentParser, Namespace
+from argparse import ArgumentParser
 from dnd_ai_be.benchmarks.util import track_with_mlflow
 
 
@@ -22,7 +22,8 @@ def get_args() -> dict:
     return vars(args)
 
 
-@track_with_mlflow(experiment_name="bm1-SimpleDialogue", verbose=True)
+# @track_with_mlflow(experiment_name="bm1-SimpleDialogue", verbose=True)
+@track_with_mlflow(experiment_name="bm1-SimpleMultiResponseDialogue", verbose=True)
 def main(**kwargs):
     """
     Loads and runs a benchmark.
@@ -52,9 +53,10 @@ def main(**kwargs):
         "Dragonborn": entity_dragonborn,
         "Mabel": npc_mabel,
     }
+    # breakpoint()
 
     # bot = ChatBot(ID="66c38445b7efa0dda2066675")
-    bot = ChatBot(ID=CHATBOT_ID)
+    bot = ChatBot(store=store, ID=CHATBOT_ID)
 
     with open(SCENARIO_FILE, "r") as f:
         scenarios = json.load(f)
@@ -66,39 +68,44 @@ def main(**kwargs):
         responder_name = dialogue[-2]["speaker"] if len(dialogue) > 1 else None
         prompter = CHARACTERS[prompter_name]
         responder = CHARACTERS[responder_name]
-        scenario_id = f"{prompter_name}_{responder_name}_{i}"
+        session_id = f"{prompter_name}_{responder_name}_{i}"
+
         messages = ChatMessageHistory()
-        for j, d in enumerate(dialogue):
+        for j, d in enumerate(dialogue[:-1]):
             content = d["content"]
             speaker = d["speaker"]
-            message = ChatMessage(role=f"{speaker}_fewshot{j}", content=content)
+            message = AIMessage(content=content)
             messages.add_message(message)
-        store[scenario_id] = messages
+        store[session_id] = messages
         input_text = dialogue[-1]["content"]
+
+        # breakpoint()  # are they chatmessages?
 
         for k in range(MAX_RESPONSES):
             if responder is None:
                 break
+            # breakpoint()
+            response = bot.generate_response(
+                input_text, prompter, responder, session_id=session_id
+            )
 
-            response = bot.generate_response(input_text, prompter, responder)
-            speaker = responder.get_name()
-            message = ChatMessage(role=f"{speaker}_response{k}", content=response)
-            store[scenario_id].add_message(message)
+            # speaker = responder.get_name()
+            # message = ChatMessage(role=f"{speaker}_response{k}", content=response)
+            # store[scenario_id].add_message(message)
 
             # Swap prompter and responder
             prompter, responder = responder, prompter
             input_text = response
+
+        # breakpoint()  # are they still chatmessages?
 
     ### SAVE OUTPUTS ###
     script_name = os.path.basename(__file__).split(".")[0]
     output_file = f"./outputs/{script_name}_mr{MAX_RESPONSES}.json"
 
     data_out = {}
-    for scenario_id, scenario in store.items():
-        scenario_outputs = []
-        for message in scenario.messages:
-            scenario_outputs.append({"role": message.role, "content": message.content})
-        data_out[scenario_id] = scenario_outputs
+    for session_id, scenario in store.items():
+        data_out[session_id] = [(m.type, m.content) for m in scenario.messages]
 
     # Write the data to a well-formatted JSON file
     with open(output_file, "w") as file:
