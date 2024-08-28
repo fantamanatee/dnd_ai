@@ -12,12 +12,14 @@ from langchain_core.messages import (
     message_to_dict,
     messages_from_dict,
 )
+from typing import Optional
 from langchain_core.messages.ai import AIMessage
 
 from langchain_core.runnables.utils import (
     ConfigurableFieldSpec,
 )
 
+from dnd_ai_be.src.bot_util import entity_like_to_context_str
 from dnd_ai_be.src.history import RunnableWithMessageHistory
 
 # from langchain_core.runnables.history import RunnableWithMessageHistory
@@ -50,31 +52,37 @@ class ChatBot:
         contextualize_q_system_prompt: str = None,
         qa_system_prompt: str = None,
         config: dict = None,
+        store: Optional[dict] = None,
         ID: str = None,
     ) -> None:
         """Initialize the Chatbot object.
         Args:
+            name: Chatbot name
             contextualize_q_system_prompt: A system prompt for contextualizing questions.
             qa_system_prompt: A system prompt for the QA system.
-            config: A ChatbotConfig object containing the configuration for the chatbot.
+            store: A session storage for conversational memory. Only used for local implementation.
+            config: A dict containing the configuration for the chatbot.
             ID: A unique identifier for the chatbot.
         """
-        ID = ObjectId(ID) if ID else None
         DEFAULT_CONFIG = {
             "model": "gpt-3.5-turbo",
             "temperature": 0,
-        }  # default config
+            "local": True,
+        }  # default config.
 
-        self.name = name
-        if config is None:
-            config = DEFAULT_CONFIG
-        self.config = config
         self.col = DB.Bots
-        self.history_aware_retriever = None
-        self.rag_chain = None
+        ID = ObjectId(ID) if ID else None
+        self.name = name
+        self.config = config if not config is None else DEFAULT_CONFIG
+
+        if self.config["local"]:
+            assert not store is None
+            self.store = store
+
         self.session_id = None
 
         if not ID is None:
+            print("ID:", ID)
             if self.col.find_one({"_id": ObjectId(ID)}) is None:
                 raise ValueError("BOT_ID does not exist in database.")
             else:
@@ -92,11 +100,12 @@ class ChatBot:
                 "name": name,
                 "contextualize_q_system_prompt": contextualize_q_system_prompt,
                 "qa_system_prompt": qa_system_prompt,
-                "config": config,
+                "config": self.config,
             }
+
             result = self.col.insert_one(chatbot_data)
             self.ID = result.inserted_id
-            print("ChatBot created with BOT_ID:", ID)
+            print("ChatBot created with BOT_ID:", self.ID)
 
         self.contextualize_q_prompt = ChatPromptTemplate.from_messages(
             [
@@ -124,24 +133,42 @@ class ChatBot:
     def get_name(self) -> str:
         return self.col.find_one({"_id": self.ID})["name"]
 
+    def get_session_history(self, session_id: str) -> BaseChatMessageHistory:
+        if session_id not in self.store:
+            self.store[session_id] = ChatMessageHistory()
+        return self.store[session_id]
+
+    def generate_session_id(self, prompter, responder) -> str:
+        return str(prompter.ID) + str(responder.ID)
+
     @traceable
     def generate_response(
-        self, input_text: str, prompter: EntityLike, responder: EntityLike
+        self,
+        input_text: str,
+        prompter: EntityLike,
+        responder: EntityLike,
+        session_id: str = None,
     ) -> str:
         """Perform QA chain.
         Args:
             prompter_input: The input for the prompter.
             responder_input: The input for the responder.
         """
-        print(f"Prompter: {prompter.get_name()}, Responder: {responder.get_name()}")
-        cur_session_id = str(prompter.ID) + str(responder.ID)
+        prompter_name = prompter.get_name()
+        responder_name = responder.get_name()
+
+        print(f"Prompter: {prompter_name}, Responder: {responder_name}")
+        cur_session_id = self.generate_session_id(prompter, responder)
         NEW_SESSION = False
         if self.session_id is None or self.session_id != cur_session_id:
             self.session_id = cur_session_id
             NEW_SESSION = True
 
-        prompter_context = f"PROMPTER_CONTEXT:\n{prompter.get_context_str()}"
-        responder_context = f"RESPONDER_CONTEXT:\n{responder.get_context_str()}"
+        prompter_context_str = entity_like_to_context_str(prompter)
+        responder_context_str = entity_like_to_context_str(responder)
+
+        prompter_context = f"{prompter_name} info:\n{prompter_context_str}"
+        responder_context = f"{responder_name} info:\n{responder_context_str}"
 
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=1000, chunk_overlap=200
@@ -151,63 +178,55 @@ class ChatBot:
             documents=splits, embedding=OpenAIEmbeddings()
         )
         retriever = vectorstore.as_retriever()
-        self.history_aware_retriever = create_history_aware_retriever(
+        history_aware_retriever = create_history_aware_retriever(
             self.llm, retriever, self.contextualize_q_prompt
         )
 
-        # if self.history_aware_retriever is None or NEW_SESSION:
-        #     self.history_aware_retriever = create_retriever()
-
         rag_chain = create_retrieval_chain(
-            self.history_aware_retriever, self.question_answer_chain
+            history_aware_retriever, self.question_answer_chain
         )
 
-        # with_message_history = RunnableWithMessageHistory(
-        #     rag_chain,
-        #     get_session_history=get_session_history,
-        #     input_messages_key="question",
-        #     history_messages_key="history",
-        #     history_factory_config=[
-        #         ConfigurableFieldSpec(
-        #             id="user_id",
-        #             annotation=str,
-        #             name="User ID",
-        #             description="Unique identifier for the user.",
-        #             default="",
-        #             is_shared=True,
-        #         ),
-        #         ConfigurableFieldSpec(
-        #             id="conversation_id",
-        #             annotation=str,
-        #             name="Conversation ID",
-        #             description="Unique identifier for the conversation.",
-        #             default="",
-        #             is_shared=True,
-        #         ),
-        #     ],
-        # )
+        # breakpoint()
 
-        print(f"session_id: {self.session_id}")
-        conversational_rag_chain = RunnableWithMessageHistory(
-            rag_chain,
-            get_session_history=lambda session_id: MongoDBChatMessageHistory(
-                session_id=session_id,
-                connection_string=URI,
-                database_name=DB_NAME,
-                collection_name="Sessions",
-            ),
-            input_messages_key="input",
-            history_messages_key="history",
-            output_messages_key="answer",
-            input_prefix=prompter.get_name(),
-            output_prefix=responder.get_name(),
-        )
+        # print(f"session_id: {self.session_id}")
 
+        conversational_rag_chain = None
+        if not self.config["local"]:
+            conversational_rag_chain = RunnableWithMessageHistory(
+                rag_chain,
+                get_session_history=lambda session_id: MongoDBChatMessageHistory(
+                    session_id=session_id,
+                    connection_string=URI,
+                    database_name=DB_NAME,
+                    collection_name="Sessions",
+                ),
+                input_messages_key="input",
+                history_messages_key="history",
+                output_messages_key="answer",
+                input_prefix=None,
+                output_prefix=None,
+            )
+        else:
+            conversational_rag_chain = RunnableWithMessageHistory(
+                rag_chain,
+                get_session_history=self.get_session_history,
+                input_messages_key="input",
+                history_messages_key="history",
+                output_messages_key="answer",
+                input_prefix=None,
+                output_prefix=None,
+            )
+
+        # FIXME what if we dont want to inject prompter_name and responder_name?
         res = conversational_rag_chain.invoke(
-            input={"input": input_text, "name": prompter.get_name()},
+            input={
+                "input": input_text,
+                "prompter_name": prompter_name,
+                "responder_name": responder_name,
+            },
             config={
                 "configurable": {
-                    "session_id": self.session_id,
+                    "session_id": session_id if session_id else self.session_id,
                 }
             },
         )
@@ -242,12 +261,11 @@ class ReasoningBot:
         DEFAULT_CONFIG = {
             "model": "gpt-3.5-turbo",
             "temperature": 0,
+            "local": True,
         }  # default config
 
         self.name = name
-        if config is None:
-            config = DEFAULT_CONFIG
-        self.config = config
+        self.config = config if not config is None else DEFAULT_CONFIG
         self.col = DB.Bots
         self.mem_col = DB.Memories
         self.reasoning_collection_name = reasoning_collection_name
@@ -267,7 +285,7 @@ class ReasoningBot:
             reasoning_bot_data = {
                 "name": name,
                 "reasoning_system_prompt": reasoning_system_prompt,
-                "config": config,
+                "config": self.config,
             }
             result = self.col.insert_one(reasoning_bot_data)
             self.ID = result.inserted_id
@@ -290,6 +308,9 @@ class ReasoningBot:
     def get_name(self) -> str:
         return self.col.find_one({"_id": self.ID})["name"]
 
+    def generate_session_id(self, prompter, responder) -> str:
+        return str(prompter.ID) + str(responder.ID)
+
     def generate_response(
         self, input_text: str, prompter: EntityLike, responder: EntityLike, k: int = 1
     ) -> str:
@@ -302,7 +323,7 @@ class ReasoningBot:
         """
 
         print(f"Prompter: {prompter.get_name()}, Responder: {responder.get_name()}")
-        cur_session_id = str(prompter.ID) + str(responder.ID)
+        cur_session_id = self.generate_session_id(prompter, responder)
         NEW_SESSION = False
         if self.session_id is None or self.session_id != cur_session_id:
             self.session_id = cur_session_id
